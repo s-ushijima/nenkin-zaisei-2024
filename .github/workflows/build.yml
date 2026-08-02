@@ -268,3 +268,42 @@ jobs:
             fi
             exit "$status"
           fi
+
+      # --- Run emp_shushi (asys20) against the standard scenario: final aggregation ---
+      - name: Set up /suuri/rev2024 tree for emp_shushi
+        run: |
+          sudo mkdir -p /suuri/rev2024/emp/rslt/ez_arev/{cutr,shushi}
+          sudo chown -R "$(id -u):$(id -g)" /suuri
+
+      - name: Run emp_shushi (asys20, standard scenario)
+        # Stdin sequence (source/emp_shushi/cntl.c then main.c's set_filenum),
+        # one value per line:
+        #   Saimu=0        標準実行(債務処理なし)
+        #   Fpset=8        カット率参照方式: bas の cuta 出力を直接使う(標準の初回実行)。
+        #                  Fpset=9 は emp/rslt/ez_arev/cutr/ 配下の既存ファイルを前提とする
+        #                  反復実行用で、初回はまだ存在しないため使えない。
+        #   Flg_Part=0, Flg_Sigo=0, Flg_Houjou=0, Touitu=0, Flg_Kmakuro=0, Flg_Dmakuro=0 -- 標準
+        #   Nfile=1000     試算番号
+        #   Ecfile=3001    経済前提番号
+        #   Wcfile=1000    外枠番号
+        #   Cutrfile4=000  bas実行時のYOBIと一致させる必要あり(KYOSHUTUKINファイル名で照合)
+        run: |
+          echo "core.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
+          ulimit -c unlimited
+          set +e
+          printf '0\n8\n0\n0\n0\n0\n0\n0\n1000\n3001\n1000\n000\n' | ./bin/emp_shushi
+          status=$?
+          set -e
+          echo "--- exit code: $status ---"
+          find /suuri/rev2024/emp/rslt/ez_arev -type f | sort
+          if [ "$status" -ne 0 ]; then
+            echo "--- looking for core dump ---"
+            core=$(find "$GITHUB_WORKSPACE" -maxdepth 2 -iname 'core*' 2>/dev/null | head -1)
+            if [ -n "$core" ]; then
+              echo "--- backtrace ($core) ---"
+              gdb -q -batch -ex "bt full" ./bin/emp_shushi "$core"
+            else
+              echo "no core dump found"
+            fi
+            exit "$status"
+          fi
