@@ -203,3 +203,36 @@ jobs:
             fi
             exit "$status"
           fi
+
+      # --- Run bas against the standard scenario ---
+      - name: Set up /suuri/rev2024 tree for bas
+        run: |
+          sudo mkdir -p /suuri/rev2024/bas/{settei,data,rslt,base_data,io_file}
+          sudo chown -R "$(id -u):$(id -g)" /suuri
+          cp -r data/bas/base_data/* /suuri/rev2024/bas/base_data/
+          cp -r data/bas/io_file/* /suuri/rev2024/bas/io_file/
+
+      - name: Run bas (standard scenario)
+        # CLI args (source/bas/cntl.c), in order after infile/outfile:
+        #   HIYOUSYADATA(KOUNEN)=1000   厚年試算番号 -- matches emp_kyufu iname
+        #   KOKUNENDATA(KOKUNEN)=1000   国年試算番号 -- matches nat KOKUNEN
+        #   ECON=3001                  経済前提
+        #   SOTOWAKU=1000               外枠番号
+        #   SOTOWAKU_CUT=1000           Option=0のため未使用(内部でSOTOWAKUと同値に上書きされる)
+        #   YOBI=000                    予備版数 -- 標準実行では未使用(kako=0,CUT_KOTEI=0のため
+        #                                B/Cフラグ行はfile_open側でスキップされる)
+        #   kako=0                      過去改正なし
+        #   CARRY=1                     繰越キャリーオーバーあり(標準)
+        #   D_MACRO=0                   デフレマクロなし
+        #   Option=0                    標準
+        #   OP_START=2031、OP_HIKIAGE_KANKAKU=3 -- jikko_bas.sh標準デフォルト
+        #   TOUGOU=0                    統合なし
+        #   CUT_KOTEI=0                 カット固定なし
+        #   CUT_ONE_SHUTU=0             標準
+        run: |
+          ./bin/bas \
+            /suuri/rev2024/bas/io_file/infile.csv \
+            /suuri/rev2024/bas/io_file/outfile.csv \
+            1000 1000 3001 1000 1000 000 0 1 0 0 2031 3 0 0 0
+          echo "--- exit code: $? ---"
+          find /suuri/rev2024/bas/rslt /suuri/rev2024/bas/data /suuri/rev2024/bas/settei -type f | sort
