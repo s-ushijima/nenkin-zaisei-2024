@@ -579,6 +579,9 @@ function sample(rows, get, n) {
 }
 
 function render() {
+  // the ResizeObserver and the colour-scheme listener can both fire before the
+  // fetch resolves, so every entry point has to tolerate "no data yet"
+  if (!state.data) return;
   const d = state.data;
   const rep = inRange(d.replacement_rate);
   const bal = inRange(d.balance);
