@@ -174,8 +174,10 @@ jobs:
           ulimit -c unlimited
           ulimit -s unlimited || true
           cd "$GITHUB_WORKSPACE"
+          set +e
           printf '11\n1000\n3001\n1000\n4\n0\n0\n0\n0\n0\n' | ./bin/emp_kyufu
           status=$?
+          set -e
           echo "--- exit code: $status ---"
           find /suuri/rev2024/emp/rslt/u-rev -type f | sort
           if [ "$status" -ne 0 ]; then
