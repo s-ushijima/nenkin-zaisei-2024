@@ -73,9 +73,17 @@ jobs:
             stat.c printout.c -lm
 
       - name: Build emp_shushi (asys20)
+        # fcls.c unconditionally closes ifp_Touitu, but fopn.c only opens it
+        # when Touitu>=1. With the standard scenario (Touitu=0) this closes
+        # a never-opened global FILE* -- segfault. Guard to match the open
+        # condition, same as the nat/emp_kyufu/bas fixes: build-only copy,
+        # committed source untouched.
         working-directory: source/emp_shushi
         run: |
-          gcc -g -o ../../bin/emp_shushi \
+          rm -rf /tmp/build_empshushi && cp -r . /tmp/build_empshushi
+          sed -i 's/fclose(ifp_Touitu);/if (Touitu >= 1) fclose(ifp_Touitu);/' /tmp/build_empshushi/fcls.c
+          cd /tmp/build_empshushi
+          gcc -g -o "$GITHUB_WORKSPACE/bin/emp_shushi" \
             main.c cntl.c stdfun.c fopn.c fcls.c flck.c econ.c rdfl.c \
             shus.c shus_calc.c shus_out.c shus_fullout.c -lm
 
