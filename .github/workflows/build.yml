@@ -1,4 +1,4 @@
-name: Build (compile check)
+name: Build and run the 財政検証 pipeline
 
 on:
   push:
@@ -8,6 +8,7 @@ on:
 
 jobs:
   build:
+    name: compile
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -119,223 +120,188 @@ jobs:
           name: binaries
           path: bin/
 
-      # --- Run wakuc against the standard scenario ---
-      # The original programs are hardcoded to read/write under the absolute
-      # path /suuri/rev2024/<module>/... (a convention from the original
-      # Unix host). We recreate that tree here rather than patch the source,
-      # to keep the reference implementation byte-for-byte faithful.
-      - name: Set up /suuri/rev2024 tree for wakuc
-        # NOTE: the program's own readdata.c calls mkdir() for its version
-        # subdirectory (rslt/ver_4_1/, then rslt/ver_4_1/rslt1000), but
-        # mkdir() is not recursive and its return value isn't checked. The
-        # parent "rslt/" directory must already exist, matching the original
-        # deployment's pre-built skeleton.
-        run: |
-          sudo mkdir -p /suuri/rev2024/wakuc/rslt
-          sudo chown -R "$(id -u):$(id -g)" /suuri
-          cp -r data/wakuc/data /suuri/rev2024/wakuc/data
+  # Each of the report's four economic cases runs the whole five-module chain
+  # in its own job. They are independent runs, so they go in parallel and --
+  # more importantly -- each gets a private /suuri tree, which means every
+  # scenario can keep the same 試算番号/外枠番号 (1000) with no chance of one
+  # scenario's intermediate files being read by another.
+  scenario:
+    name: run econ-${{ matrix.econ }}
+    needs: build
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false     # a diverging scenario must not cancel the others
+      matrix:
+        include:
+          # ROUDR is the labour-force-participation scenario, which the report
+          # pairs with the economic case (第3-4-28表): the two growth cases use
+          # 労働参加進展, 過去30年投影 uses 漸進, ゼロ成長 uses 現状.
+          # wakuc/cntl.c: 1=進展, 2=漸進, 3=現状 (all at 入国超過16万人).
+          - econ: "3001"
+            roudr: "1"
+            label: 高成長実現ケース
+          - econ: "3002"
+            roudr: "1"
+            label: 成長型経済移行・継続ケース
+          - econ: "3003"
+            roudr: "2"
+            label: 過去30年投影ケース
+          - econ: "3004"
+            roudr: "3"
+            label: 1人当たりゼロ成長ケース
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Run wakuc (standard scenario)
-        # CP sequence (source/wakuc/cntl.c), one value per line:
-        #   BANGO=1000  (試算番号)
-        #   MODE=0      (経済シナリオ: 標準)
-        #   MODE45=0    (令和4/5年度前提の別: 標準)
-        #   JIN=1       (人口: 出生中位) -- cntl.c: 1=出生中位, 2=出生高位, 3=出生低位.
-        #                以前はJIN=2(出生高位)を「中位」と誤コメントしたまま実行しており、
-        #                官報レポート数値との突合で判明(所得代替率が公式の出生高位列と
-        #                一致し、出生中位列とはズレていた)。pop1-210.csv がJIN=1,QX=1,NC=0
-        #                向けに用意されている。
-        #   QX=1        (死亡率: 中位)
-        #   NC=0        (人口前提バージョン: 令和5年推計相当のベース)
-        #   ROUDR=1     (労働力率: 労働参加進展ケース, 外国人16万人) -- cntl.c通り。
-        #                以前「成長型経済移行・継続ケース」と誤記していたが、これは
-        #                経済ケース名であって労働力率ケース名ではない(官報の高成長実現・
-        #                成長型経済移行いずれも労働参加進展シナリオを用いる)。
-        run: |
-          printf '1000\n0\n0\n1\n1\n0\n1\n' | ./bin/wakuc
-          echo "--- exit code: $? ---"
-          find /suuri/rev2024/wakuc/rslt -type f | sort
+      - uses: actions/download-artifact@v4
+        with:
+          name: binaries
+          path: bin
 
-      # --- Run nat against the standard scenario ---
-      - name: Set up /suuri/rev2024 tree for nat
-        # nat also reads emp's economic-assumption CSVs (econ-{ECON}.csv).
-        run: |
-          sudo mkdir -p /suuri/rev2024/nat/rslt /suuri/rev2024/nat/data /suuri/rev2024/nat/base_data /suuri/rev2024/nat/io_file
-          sudo mkdir -p /suuri/rev2024/emp/data
-          sudo chown -R "$(id -u):$(id -g)" /suuri
-          cp -r data/nat/base_data/* /suuri/rev2024/nat/base_data/
-          cp -r data/nat/io_file/* /suuri/rev2024/nat/io_file/
-          [ -d /suuri/rev2024/emp/data/u-rev ] || cp -r data/emp/data/* /suuri/rev2024/emp/data/
+      - name: Restore the executable bit
+        # upload-artifact does not preserve file modes
+        run: chmod +x bin/*
 
-      - name: Run nat (standard scenario)
-        # CLI args (source/nat/cntl.c), in order after infile/outfile:
-        #   KOKUNEN=1000        試算番号
-        #   ECON=3001           経済前提(econ-3001.csv)
-        #   SOTOWAKU=1000       外枠番号 -- matches wakuc's BANGO output above
-        #   BIRTH=0             出生前提(birth_ratio_0.csv)
-        #   DEATH=M             死亡前提・中位(QX-M2023.csv)
-        #   KAKO=0              過去改正なし
-        #   TINSURA=1、KAKUDAI=0、KAKUDAI_YEAR=2027、OPTION=0、OP_START=2031、
-        #   OP_HIKIAGE_KANKAKU=3 -- jikko_nat.sh の標準デフォルト値をそのまま採用
-        #   SOTOWAKU_JURAI=1000 同上、wakuc出力を再利用
-        run: |
-          ./bin/nat \
-            /suuri/rev2024/nat/io_file/infile.csv \
-            /suuri/rev2024/nat/io_file/outfile.csv \
-            1000 3001 1000 0 M 0 1 0 2027 0 2031 3 1000
-          echo "--- exit code: $? ---"
-          find /suuri/rev2024/nat/rslt /suuri/rev2024/nat/data -type f | sort
-
-      # --- Run emp_kyufu (usys20) against the standard scenario ---
-      - name: Set up /suuri/rev2024 tree for emp_kyufu
-        # Output subdirectories enumerated from source/emp_kyufu/fileio.cpp
-        # (fopen() calls with mode "w" under /emp/rslt/u-rev/...); none of
-        # these get created automatically.
-        run: |
-          sudo mkdir -p /suuri/rev2024/emp/rslt/u-rev/{shus,kiso,bunpu,kaite,hikaku,ashimoto,hou,kisor}
-          sudo chown -R "$(id -u):$(id -g)" /suuri
-
-      - name: Run emp_kyufu (usys20, standard scenario)
-        # Stdin sequence (source/emp_kyufu/main.cpp then cntl.cpp), one value per line:
-        #   key=11       標準実行 (11: 通常実行)
-        #   iname=1000   試算番号
-        #   iecon=3001   経済前提番号
-        #   iwname=1000  外枠番号 -- matches wakuc's BANGO output above
-        #   seimei=4     生命表: 死亡中位
-        #   flg_part=0   パート適用拡大: なし(標準実行)
-        #   flg_sigo=0   在職老齢年金45年改正: なし
-        #   flg_kozax=0  在職老齢年金支給停止基準額の特例: なし
-        #   houjou=0     標準報酬月額上限特例: なし
-        #   flg_inout=0  単身・扶養判定範囲: 標準
-        # main.cpp internally loops over pseid in {0,1,4,5} (kou/kok/ren/sig)
-        # automatically when key==11, so this single invocation covers all
-        # four institutions.
+      - name: Install gdb (for backtraces if a module crashes)
         run: |
           sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends gdb
           echo "core.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
+
+      - name: Set up the /suuri/rev2024 tree
+        # The original programs hardcode absolute paths under
+        # /suuri/rev2024/<module>/..., a convention from the original Unix
+        # host. We recreate that tree rather than patch the source, to keep
+        # the reference implementation byte-for-byte faithful.
+        #
+        # Every output directory has to exist before the run: the programs
+        # call mkdir() non-recursively and never check its return value, so a
+        # missing parent silently yields a failed fopen() later.
+        run: |
+          sudo mkdir -p \
+            /suuri/rev2024/wakuc/rslt \
+            /suuri/rev2024/nat/{rslt,data,base_data,io_file} \
+            /suuri/rev2024/bas/{settei,data,rslt,base_data,io_file} \
+            /suuri/rev2024/emp/data \
+            /suuri/rev2024/emp/rslt/u-rev/{shus,kiso,bunpu,kaite,hikaku,ashimoto,hou,kisor} \
+            /suuri/rev2024/emp/rslt/ez_arev/{cutr,shushi}
+          sudo chown -R "$(id -u):$(id -g)" /suuri
+          cp -r data/wakuc/data      /suuri/rev2024/wakuc/data
+          cp -r data/nat/base_data/* /suuri/rev2024/nat/base_data/
+          cp -r data/nat/io_file/*   /suuri/rev2024/nat/io_file/
+          cp -r data/bas/base_data/* /suuri/rev2024/bas/base_data/
+          cp -r data/bas/io_file/*   /suuri/rev2024/bas/io_file/
+          cp -r data/emp/data/*      /suuri/rev2024/emp/data/
+
+      - name: Run wakuc (外枠)
+        # CP sequence (source/wakuc/cntl.c), one value per line:
+        #   BANGO=1000  (試算番号)
+        #   MODE=0      (適用拡大なし・現行制度)
+        #   MODE45=0    (基礎40年・現行制度)
+        #   JIN=1       (出生中位) -- cntl.c: 1=中位, 2=高位, 3=低位. An earlier
+        #                revision passed JIN=2 while commenting it as 中位; the
+        #                crosscheck against the official report caught it (our
+        #                所得代替率 matched the 出生高位 column, not 中位).
+        #   QX=1        (死亡中位)
+        #   NC=0        (入国超過16万人・令和5年推計ベース)
+        #   ROUDR       (労働力率シナリオ -- varies by economic case, see matrix)
+        run: |
+          printf '1000\n0\n0\n1\n1\n0\n${{ matrix.roudr }}\n' | ./bin/wakuc
+          echo "--- exit code: $? ---"
+          ls /suuri/rev2024/wakuc/rslt/ver_4_1/rslt1000 | wc -l
+
+      - name: Run nat (国民年金)
+        # CLI args (source/nat/cntl.c), after infile/outfile:
+        #   KOKUNEN=1000, ECON=<matrix>, SOTOWAKU=1000 (wakuc's BANGO above),
+        #   BIRTH=0, DEATH=M (中位), KAKO=0, TINSURA=1, KAKUDAI=0,
+        #   KAKUDAI_YEAR=2027, OPTION=0, OP_START=2031,
+        #   OP_HIKIAGE_KANKAKU=3, SOTOWAKU_JURAI=1000
+        #   -- jikko_nat.sh の標準デフォルト値
+        run: |
+          ./bin/nat \
+            /suuri/rev2024/nat/io_file/infile.csv \
+            /suuri/rev2024/nat/io_file/outfile.csv \
+            1000 ${{ matrix.econ }} 1000 0 M 0 1 0 2027 0 2031 3 1000
+          echo "--- exit code: $? ---"
+
+      - name: Run emp_kyufu (usys20, 給付費推計)
+        # Stdin (source/emp_kyufu/main.cpp then cntl.cpp), one value per line:
+        #   key=11 (通常実行), iname=1000, iecon=<matrix>, iwname=1000,
+        #   seimei=4 (死亡中位), flg_part=0, flg_sigo=0, flg_kozax=0,
+        #   houjou=0, flg_inout=0
+        # main.cpp loops over pseid in {0,1,4,5} (kou/kok/ren/sig) internally
+        # when key==11, so this one invocation covers all four institutions.
+        run: |
           ulimit -c unlimited
           ulimit -s unlimited || true
-          cd "$GITHUB_WORKSPACE"
           set +e
-          printf '11\n1000\n3001\n1000\n4\n0\n0\n0\n0\n0\n' | ./bin/emp_kyufu
+          printf '11\n1000\n${{ matrix.econ }}\n1000\n4\n0\n0\n0\n0\n0\n' | ./bin/emp_kyufu
           status=$?
           set -e
           echo "--- exit code: $status ---"
-          find /suuri/rev2024/emp/rslt/u-rev -type f | sort
           if [ "$status" -ne 0 ]; then
-            echo "--- looking for core dump ---"
-            core=$(find "$GITHUB_WORKSPACE" /tmp /var/lib/apport -maxdepth 3 -iname 'core*' 2>/dev/null | head -1)
-            if [ -n "$core" ]; then
-              echo "--- backtrace ($core) ---"
-              gdb -q -batch -ex "bt full" ./bin/emp_kyufu "$core"
-            else
-              echo "no core dump found; core_pattern=$(cat /proc/sys/kernel/core_pattern)"
-            fi
+            core=$(find "$GITHUB_WORKSPACE" /tmp -maxdepth 3 -iname 'core*' 2>/dev/null | head -1)
+            if [ -n "$core" ]; then gdb -q -batch -ex "bt full" ./bin/emp_kyufu "$core"; fi
             exit "$status"
           fi
 
-      # --- Run bas against the standard scenario ---
-      - name: Set up /suuri/rev2024 tree for bas
+      - name: Run bas (基礎年金)
+        # CLI args (source/bas/cntl.c), after infile/outfile:
+        #   KOUNEN=1000, KOKUNEN=1000, ECON=<matrix>, SOTOWAKU=1000,
+        #   SOTOWAKU_CUT=1000 (unused at Option=0), YOBI=000, kako=0,
+        #   CARRY=1, D_MACRO=0, Option=0, OP_START=2031,
+        #   OP_HIKIAGE_KANKAKU=3, TOUGOU=0, CUT_KOTEI=0, CUT_ONE_SHUTU=0
         run: |
-          sudo mkdir -p /suuri/rev2024/bas/{settei,data,rslt,base_data,io_file}
-          sudo chown -R "$(id -u):$(id -g)" /suuri
-          cp -r data/bas/base_data/* /suuri/rev2024/bas/base_data/
-          cp -r data/bas/io_file/* /suuri/rev2024/bas/io_file/
-
-      - name: Run bas (standard scenario)
-        # CLI args (source/bas/cntl.c), in order after infile/outfile:
-        #   HIYOUSYADATA(KOUNEN)=1000   厚年試算番号 -- matches emp_kyufu iname
-        #   KOKUNENDATA(KOKUNEN)=1000   国年試算番号 -- matches nat KOKUNEN
-        #   ECON=3001                  経済前提
-        #   SOTOWAKU=1000               外枠番号
-        #   SOTOWAKU_CUT=1000           Option=0のため未使用(内部でSOTOWAKUと同値に上書きされる)
-        #   YOBI=000                    予備版数 -- 標準実行では未使用(kako=0,CUT_KOTEI=0のため
-        #                                B/Cフラグ行はfile_open側でスキップされる)
-        #   kako=0                      過去改正なし
-        #   CARRY=1                     繰越キャリーオーバーあり(標準)
-        #   D_MACRO=0                   デフレマクロなし
-        #   Option=0                    標準
-        #   OP_START=2031、OP_HIKIAGE_KANKAKU=3 -- jikko_bas.sh標準デフォルト
-        #   TOUGOU=0                    統合なし
-        #   CUT_KOTEI=0                 カット固定なし
-        #   CUT_ONE_SHUTU=0             標準
-        run: |
-          echo "core.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
           ulimit -c unlimited
           set +e
           ./bin/bas \
             /suuri/rev2024/bas/io_file/infile.csv \
             /suuri/rev2024/bas/io_file/outfile.csv \
-            1000 1000 3001 1000 1000 000 0 1 0 0 2031 3 0 0 0
+            1000 1000 ${{ matrix.econ }} 1000 1000 000 0 1 0 0 2031 3 0 0 0
           status=$?
           set -e
           echo "--- exit code: $status ---"
-          find /suuri/rev2024/bas/rslt /suuri/rev2024/bas/data /suuri/rev2024/bas/settei -type f | sort
           if [ "$status" -ne 0 ]; then
-            echo "--- looking for core dump ---"
             core=$(find "$GITHUB_WORKSPACE" -maxdepth 2 -iname 'core*' 2>/dev/null | head -1)
-            if [ -n "$core" ]; then
-              echo "--- backtrace ($core) ---"
-              gdb -q -batch -ex "bt full" ./bin/bas "$core"
-            else
-              echo "no core dump found"
-            fi
+            if [ -n "$core" ]; then gdb -q -batch -ex "bt full" ./bin/bas "$core"; fi
             exit "$status"
           fi
 
-      # --- Run emp_shushi (asys20) against the standard scenario: final aggregation ---
-      - name: Set up /suuri/rev2024 tree for emp_shushi
+      - name: Run emp_shushi (asys20, 収支計算)
+        # Stdin (source/emp_shushi/cntl.c then main.c's set_filenum):
+        #   Saimu=0, Fpset=8, Flg_Part=0, Flg_Sigo=0, Flg_Houjou=0, Touitu=0,
+        #   Flg_Kmakuro=0, Flg_Dmakuro=0, Nfile=1000, Ecfile=<matrix>,
+        #   Wcfile=1000, Cutrfile4=000
+        # Fpset=8 reads bas's cuta output directly (the first-run path);
+        # Fpset=9 presumes existing files under emp/rslt/ez_arev/cutr/ and is
+        # for iterated runs, so it cannot be used here.
+        # Cutrfile4 must match bas's YOBI (matched via the KYOSHUTUKIN filename).
         run: |
-          sudo mkdir -p /suuri/rev2024/emp/rslt/ez_arev/{cutr,shushi}
-          sudo chown -R "$(id -u):$(id -g)" /suuri
-
-      - name: Run emp_shushi (asys20, standard scenario)
-        # Stdin sequence (source/emp_shushi/cntl.c then main.c's set_filenum),
-        # one value per line:
-        #   Saimu=0        標準実行(債務処理なし)
-        #   Fpset=8        カット率参照方式: bas の cuta 出力を直接使う(標準の初回実行)。
-        #                  Fpset=9 は emp/rslt/ez_arev/cutr/ 配下の既存ファイルを前提とする
-        #                  反復実行用で、初回はまだ存在しないため使えない。
-        #   Flg_Part=0, Flg_Sigo=0, Flg_Houjou=0, Touitu=0, Flg_Kmakuro=0, Flg_Dmakuro=0 -- 標準
-        #   Nfile=1000     試算番号
-        #   Ecfile=3001    経済前提番号
-        #   Wcfile=1000    外枠番号
-        #   Cutrfile4=000  bas実行時のYOBIと一致させる必要あり(KYOSHUTUKINファイル名で照合)
-        run: |
-          echo "core.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
           ulimit -c unlimited
           set +e
-          printf '0\n8\n0\n0\n0\n0\n0\n0\n1000\n3001\n1000\n000\n' | ./bin/emp_shushi
+          printf '0\n8\n0\n0\n0\n0\n0\n0\n1000\n${{ matrix.econ }}\n1000\n000\n' | ./bin/emp_shushi
           status=$?
           set -e
           echo "--- exit code: $status ---"
           find /suuri/rev2024/emp/rslt/ez_arev -type f | sort
           if [ "$status" -ne 0 ]; then
-            echo "--- looking for core dump ---"
             core=$(find "$GITHUB_WORKSPACE" -maxdepth 2 -iname 'core*' 2>/dev/null | head -1)
-            if [ -n "$core" ]; then
-              echo "--- backtrace ($core) ---"
-              gdb -q -batch -ex "bt full" ./bin/emp_shushi "$core"
-            else
-              echo "no core dump found"
-            fi
+            if [ -n "$core" ]; then gdb -q -batch -ex "bt full" ./bin/emp_shushi "$core"; fi
             exit "$status"
           fi
 
-      - name: Collect standard-scenario result CSVs for download
-        # 01shushi/03summary/90nenbe (emp_shushi) contain the headline figures
-        # (所得代替率, 積立金 etc.) used for the official-report crosscheck and
-        # the Pages dashboard; wakuc/nat/bas outputs are kept too so later
-        # sessions don't need to re-run the pipeline just to inspect them.
+      - name: Collect this scenario's result CSVs
+        # 01shushi/03summary (emp_shushi) carry the headline figures
+        # (所得代替率, 積立金) the dashboard and the official-report crosscheck
+        # read; the upstream modules' output is kept so a later session can
+        # inspect them without re-running the ~12min chain.
         run: |
           mkdir -p /tmp/results
           cp -r /suuri/rev2024/emp/rslt/ez_arev /tmp/results/emp_ez_arev
-          cp -r /suuri/rev2024/wakuc/rslt /tmp/results/wakuc_rslt
-          cp -r /suuri/rev2024/nat/rslt /tmp/results/nat_rslt
-          cp -r /suuri/rev2024/bas/rslt /tmp/results/bas_rslt
+          cp -r /suuri/rev2024/wakuc/rslt       /tmp/results/wakuc_rslt
+          cp -r /suuri/rev2024/nat/rslt         /tmp/results/nat_rslt
+          cp -r /suuri/rev2024/bas/rslt         /tmp/results/bas_rslt
 
       - uses: actions/upload-artifact@v4
         with:
-          name: standard-scenario-results
+          name: scenario-results-${{ matrix.econ }}
           path: /tmp/results
