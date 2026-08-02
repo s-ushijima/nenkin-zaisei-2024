@@ -168,6 +168,23 @@ jobs:
         # automatically when key==11, so this single invocation covers all
         # four institutions.
         run: |
+          sudo apt-get install -y gdb >/dev/null
+          echo "core.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
+          ulimit -c unlimited
+          ulimit -s unlimited || true
+          cd "$GITHUB_WORKSPACE"
           printf '11\n1000\n3001\n1000\n4\n0\n0\n0\n0\n0\n' | ./bin/emp_kyufu
-          echo "--- exit code: $? ---"
+          status=$?
+          echo "--- exit code: $status ---"
           find /suuri/rev2024/emp/rslt/u-rev -type f | sort
+          if [ "$status" -ne 0 ]; then
+            echo "--- looking for core dump ---"
+            core=$(find "$GITHUB_WORKSPACE" /tmp /var/lib/apport -maxdepth 3 -iname 'core*' 2>/dev/null | head -1)
+            if [ -n "$core" ]; then
+              echo "--- backtrace ($core) ---"
+              gdb -q -batch -ex "bt full" ./bin/emp_kyufu "$core"
+            else
+              echo "no core dump found; core_pattern=$(cat /proc/sys/kernel/core_pattern)"
+            fi
+            exit "$status"
+          fi
