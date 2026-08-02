@@ -89,8 +89,13 @@ jobs:
       # Unix host). We recreate that tree here rather than patch the source,
       # to keep the reference implementation byte-for-byte faithful.
       - name: Set up /suuri/rev2024 tree for wakuc
+        # NOTE: the program's own readdata.c calls mkdir() for its version
+        # subdirectory (rslt/ver_4_1/, then rslt/ver_4_1/rslt1000), but
+        # mkdir() is not recursive and its return value isn't checked. The
+        # parent "rslt/" directory must already exist, matching the original
+        # deployment's pre-built skeleton.
         run: |
-          sudo mkdir -p /suuri/rev2024/wakuc
+          sudo mkdir -p /suuri/rev2024/wakuc/rslt
           sudo chown -R "$(id -u):$(id -g)" /suuri
           cp -r data/wakuc/data /suuri/rev2024/wakuc/data
 
