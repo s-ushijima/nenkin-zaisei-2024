@@ -39,12 +39,14 @@ jobs:
 
       - name: Build nat
         # Despite the .c extension, this source uses C++ headers (<cstdio> etc.).
-        # -Dfdiv=fdiv_nat_impl: the source defines its own fdiv(double,double),
-        # which collides with glibc's C23 narrowing fdiv() pulled in via <cmath>
-        # on modern toolchains. Renamed at preprocess time only; source untouched.
+        # -D_POSIX_C_SOURCE: the source defines its own fdiv(double,double),
+        # which collides with glibc's C23 narrowing fdiv() declared in
+        # <bits/mathcalls-narrow.h> (pulled in via <cmath> when GNU/BSD
+        # extensions are enabled). Restricting to POSIX feature macros keeps
+        # that header out without touching the original source.
         working-directory: source/nat
         run: |
-          g++ -g -Dfdiv=fdiv_nat_impl -o ../../bin/nat \
+          g++ -g -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -o ../../bin/nat \
             main.c stdfm.c cntl.c file_open.c seid.c econ.c waku.c \
             kaizen.c dtst.c kiso.c noufuritu.c siml.c str_op.c shke.c \
             stat.c printout.c -lm
