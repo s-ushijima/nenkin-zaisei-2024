@@ -315,3 +315,20 @@ jobs:
             fi
             exit "$status"
           fi
+
+      - name: Collect standard-scenario result CSVs for download
+        # 01shushi/03summary/90nenbe (emp_shushi) contain the headline figures
+        # (所得代替率, 積立金 etc.) used for the official-report crosscheck and
+        # the Pages dashboard; wakuc/nat/bas outputs are kept too so later
+        # sessions don't need to re-run the pipeline just to inspect them.
+        run: |
+          mkdir -p /tmp/results
+          cp -r /suuri/rev2024/emp/rslt/ez_arev /tmp/results/emp_ez_arev
+          cp -r /suuri/rev2024/wakuc/rslt /tmp/results/wakuc_rslt
+          cp -r /suuri/rev2024/nat/rslt /tmp/results/nat_rslt
+          cp -r /suuri/rev2024/bas/rslt /tmp/results/bas_rslt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: standard-scenario-results
+          path: /tmp/results
