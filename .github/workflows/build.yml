@@ -115,11 +115,14 @@ jobs:
 
       # --- Run nat against the standard scenario ---
       - name: Set up /suuri/rev2024 tree for nat
+        # nat also reads emp's economic-assumption CSVs (econ-{ECON}.csv).
         run: |
           sudo mkdir -p /suuri/rev2024/nat/rslt /suuri/rev2024/nat/data /suuri/rev2024/nat/base_data /suuri/rev2024/nat/io_file
+          sudo mkdir -p /suuri/rev2024/emp/data
           sudo chown -R "$(id -u):$(id -g)" /suuri
           cp -r data/nat/base_data/* /suuri/rev2024/nat/base_data/
           cp -r data/nat/io_file/* /suuri/rev2024/nat/io_file/
+          [ -d /suuri/rev2024/emp/data/u-rev ] || cp -r data/emp/data/* /suuri/rev2024/emp/data/
 
       - name: Run nat (standard scenario)
         # CLI args (source/nat/cntl.c), in order after infile/outfile:
