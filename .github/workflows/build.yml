@@ -1,0 +1,72 @@
+name: Build (compile check)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Show compiler versions
+        run: |
+          gcc --version
+          g++ --version
+
+      - name: Build wakuc
+        working-directory: source/wakuc
+        run: |
+          mkdir -p ../../bin
+          gcc -g -o ../../bin/wakuc \
+            main.c cntl.c cutout.c fout.c readdata.c roudfout.c \
+            setjinko.c simlichisan.c simlkou.c simlkyos.c simlpart.c \
+            simlroud.c stdfm.c zero.c -lm
+
+      - name: Build bas
+        working-directory: source/bas
+        run: |
+          gcc -g -o ../../bin/bas \
+            Atamawari.c Atamawari_cut.c cntl.c econ.c file_open.c \
+            file_write_cut.c file_write_kakyu.c main.c printout.c \
+            read_cut.c read_file.c ReadHiyousha.c ReadKokunen_jisseki.c \
+            stdfm.c tumatumi_cal_jisseki.c tyousei.c waku.c dtst.c \
+            dokuzi_cal.c -lm
+
+      - name: Build nat
+        working-directory: source/nat
+        run: |
+          gcc -g -o ../../bin/nat \
+            main.c stdfm.c cntl.c file_open.c seid.c econ.c waku.c \
+            kaizen.c dtst.c kiso.c noufuritu.c siml.c str_op.c shke.c \
+            stat.c printout.c -lm
+
+      - name: Build emp_shushi (asys20)
+        working-directory: source/emp_shushi
+        run: |
+          gcc -g -o ../../bin/emp_shushi \
+            main.c cntl.c stdfun.c fopn.c fcls.c flck.c econ.c rdfl.c \
+            shus.c shus_calc.c shus_out.c shus_fullout.c -lm
+
+      - name: Build emp_kyufu (usys20)
+        working-directory: source/emp_kyufu
+        run: |
+          g++ -g -I ext -I common -I lib -o ../../bin/emp_kyufu \
+            sepslib.cpp main.cpp zero.cpp cntl.cpp sepsd.cpp fileio.cpp \
+            flck.cpp waku.cpp econ.cpp seid.cpp krgn.cpp kiso.cpp sknr.cpp \
+            subrh.cpp subrj.cpp dtst.cpp shke.cpp shkehiho.cpp shkejken.cpp \
+            shkejsha.cpp siku.cpp shkejuk.cpp shkekiso.cpp dsitk.cpp \
+            siml.cpp simlg.cpp simlbzw.cpp simlsaite1.cpp simlsaite2.cpp \
+            simlrhnf.cpp outkn.cpp rousaki.cpp pstat.cpp stat.cpp \
+            outhou.cpp crshfl.cpp -lm
+
+      - name: List built binaries
+        run: ls -la bin/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: binaries
+          path: bin/
