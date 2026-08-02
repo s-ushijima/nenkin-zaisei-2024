@@ -1,0 +1,46 @@
+#include "_prototype.h"
+
+class02::class02(const class02& arg02a) {
+  set_var001(arg02a.var001);
+  set_var002(arg02a.var002);
+  set_var003(arg02a.var003);
+  set_var004(arg02a.var004);
+  set_var005(arg02a.var005);
+  set_var006(arg02a.var006);
+  set_var007(arg02a.var007);
+  set_var008(arg02a.var008);
+  set_var009(arg02a.var009);
+  set_var010(arg02a.var010);
+  set_var011(arg02a.var011);
+  set_var012(arg02a.var012);
+  set_var013(arg02a.var013);
+  set_var014(arg02a.var014);
+  set_var015(arg02a.var015);
+  set_var016(arg02a.var016);
+  set_var017(arg02a.var017);
+  set_var018(arg02a.var018);
+  set_var019(arg02a.var019);
+  set_var020(arg02a.var020);
+  set_var021(arg02a.var021);
+  set_var022(arg02a.var022);
+  set_var023(arg02a.var023);
+  set_var024(arg02a.var024);
+  set_var025(arg02a.var025);
+  set_var026(arg02a.var026);
+  set_var027(arg02a.var027);
+  set_var028(arg02a.var028);
+  set_var029(arg02a.var029);
+  set_var030(arg02a.var030);
+  set_var031(arg02a.var031);
+  set_var032(arg02a.var032);
+  set_var035(arg02a.var035);
+  set_var036(arg02a.var036);
+  set_var037(arg02a.var037);
+  set_var038(arg02a.var038);
+  set_var039(arg02a.var039);
+  set_var040(arg02a.var040);
+  set_var041(arg02a.var041);
+  set_var042(arg02a.var042);
+  set_var043(arg02a.var043);
+  set_var044(arg02a.var044);
+}

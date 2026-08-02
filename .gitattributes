@@ -1,0 +1,4 @@
+# Legacy C source and CSV data use CP932/EUC-JP encodings and mixed line
+# endings. Disable Git's newline normalization everywhere to avoid silently
+# corrupting file bytes.
+* -text

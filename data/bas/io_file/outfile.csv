@@ -1,0 +1,9 @@
+ファイル番号,出力の有無,ディレクトリ,ファイル名,オープンモード
+0,1,/suuri/rev2024/bas/settei,/SETTEI_{Version}-{Version_cut},a
+1,1,/suuri/rev2024/bas/data,/KYOSHUTUKIN{Version}-{YOBI},w
+2,1,/suuri/rev2024/bas/rslt,/TUMATUMI-{KOKUNENDATA}-{ECON}-{SOTOWAKU}-{YOBI}-00.csv,w
+3,1,/suuri/rev2024/bas/rslt,/kekka{Version}-{Version_cut}b.csv,w
+4,1,/suuri/rev2024/bas/rslt,/kekka{Version}-{Version_cut}a.csv,w
+5,1,/suuri/rev2024/bas/rslt,/cuta-{Version}-{Version_cut}.csv,w
+6,1,/suuri/rev2024/bas/rslt,/output.csv,a
+7,D,/suuri/rev2024/bas/data,/provide{Version}-{YOBI}.csv,w

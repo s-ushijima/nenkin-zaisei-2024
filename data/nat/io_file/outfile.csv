@@ -1,0 +1,12 @@
+ファイル番号,出力の有無,ディレクトリ,ファイル名,オープンモード
+0,1,/suuri/rev2024/nat/rslt,/HIHO{Version}.csv,w
+1,1,/suuri/rev2024/nat/rslt,/ROREI{Version}.csv,w
+2,1,/suuri/rev2024/nat/rslt,/ROREI_SHINKI{Version}.csv,w
+3,1,/suuri/rev2024/nat/rslt,/SHOGAI{Version}.csv,w
+4,1,/suuri/rev2024/nat/rslt,/IZOKU{Version}.csv,w
+5,1,/suuri/rev2024/nat/data,/KISONENKIN{Version},w
+6,1,/suuri/rev2024/nat/data,/DOKUZI{Version}.csv,w
+7,1,/suuri/rev2024/nat/data,/KOKUKAITE-{KAKO}{ECON}E.csv,w
+8,1,/suuri/rev2024/nat/data,/KOKUKAITE-{KOKUNEN}-{ECON}E.csv,w
+9,1,/suuri/rev2024/nat/data,/nat_wariai{KOKUNEN}-{SOTOWAKU}.csv,w
+10,1,/suuri/rev2024/nat/data,/PENSION_{Version}.csv,w

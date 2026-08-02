@@ -1,0 +1,16 @@
+#ifdef OPTION_H_INCLUDED
+	#define OPTION_H_INCLUDED
+	#define EXTERN
+#else
+	#define EXTERN	extern
+#endif
+
+EXTERN int Part;
+EXTERN int Part_Year;
+EXTERN int Option;
+EXTERN int OPTION_START;
+EXTERN int OP_HIKIAGE_KANKAKU;
+
+#define OP_MAX_KYOSHUTU_NENREI 65
+
+EXTERN double Sotowaku_Jurai[MAX_SHUBETU][SAISHUNENDO - SOTOWAKU_SHONENDO + 1][MAX_WAKU_NENREI - MIN_WAKU_NENREI + 1];
