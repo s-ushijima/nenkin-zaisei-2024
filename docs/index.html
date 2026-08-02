@@ -3,295 +3,753 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>公的年金財政検証2024 再現ダッシュボード(v1)</title>
+<title>公的年金財政検証2024 再現ダッシュボード</title>
+<meta name="description" content="厚生労働省公開の財政検証プログラム(C/C++)を再ビルド・実行し、標準シナリオの長期見通しを公式レポートと突き合わせたダッシュボード。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%232a78d6'/%3E%3Cpath d='M3 11.5 L6.5 7 L9.5 9.5 L13 4' stroke='white' stroke-width='1.6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <style>
+  /* Tokens follow the dataviz reference palette. Dark values are declared under
+     both the media query (OS setting) and the [data-theme] scope (in-page
+     toggle) so the toggle wins in both directions. */
   :root {
-    --bg: #0f1115;
-    --panel: #171a21;
-    --panel-border: #2a2f3a;
-    --text: #e6e8ec;
-    --text-dim: #9aa1ad;
-    --accent: #4da3ff;
-    --accent2: #ff9f4d;
-    --good: #4caf7d;
-    --warn: #e0b84c;
+    color-scheme: light;
+    --page:        #f9f9f7;
+    --surface:     #fcfcfb;
+    --ink:         #0b0b0b;
+    --ink-2:       #52514e;
+    --muted:       #898781;
+    --grid:        #e1e0d9;
+    --axis:        #c3c2b7;
+    --hairline:    rgba(11,11,11,0.10);
+    --series-1:    #2a78d6;
+    --series-2:    #eb6834;
+    --ok:          #006300;
+    --tab-active:  rgba(42,120,214,0.10);
   }
+  @media (prefers-color-scheme: dark) {
+    :root:where(:not([data-theme="light"])) {
+      color-scheme: dark;
+      --page:      #0d0d0d;
+      --surface:   #1a1a19;
+      --ink:       #ffffff;
+      --ink-2:     #c3c2b7;
+      --muted:     #898781;
+      --grid:      #2c2c2a;
+      --axis:      #383835;
+      --hairline:  rgba(255,255,255,0.10);
+      --series-1:  #3987e5;
+      --series-2:  #d95926;
+      --ok:        #0ca30c;
+      --tab-active: rgba(57,135,229,0.16);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:      #0d0d0d;
+    --surface:   #1a1a19;
+    --ink:       #ffffff;
+    --ink-2:     #c3c2b7;
+    --muted:     #898781;
+    --grid:      #2c2c2a;
+    --axis:      #383835;
+    --hairline:  rgba(255,255,255,0.10);
+    --series-1:  #3987e5;
+    --series-2:  #d95926;
+    --ok:        #0ca30c;
+    --tab-active: rgba(57,135,229,0.16);
+  }
+
   * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
   body {
     margin: 0;
-    font-family: "Hiragino Sans", "Yu Gothic", "Meiryo", system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
+    background: var(--page);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", "Hiragino Sans", "Noto Sans JP", sans-serif;
     line-height: 1.7;
+    font-size: 15px;
   }
-  header {
-    padding: 32px 24px 16px;
-    max-width: 1000px;
-    margin: 0 auto;
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 20px; }
+
+  /* ── header ─────────────────────────────────────────────── */
+  header { padding: 40px 0 20px; }
+  .titlebar { display: flex; align-items: flex-start; gap: 16px; }
+  h1 { font-size: 1.6rem; line-height: 1.35; margin: 0 0 6px; letter-spacing: -0.01em; }
+  .lede { color: var(--ink-2); margin: 0; max-width: 68ch; font-size: 0.95rem; }
+  .note-warn {
+    margin: 14px 0 0; padding: 10px 14px; font-size: 0.84rem; color: var(--ink-2);
+    border-left: 2px solid var(--axis); background: var(--surface); border-radius: 0 6px 6px 0;
   }
-  header h1 {
-    font-size: 1.5rem;
-    margin: 0 0 8px;
+  a { color: var(--series-1); }
+
+  .icon-btn {
+    margin-left: auto; flex: none; background: var(--surface); color: var(--ink-2);
+    border: 1px solid var(--hairline); border-radius: 8px; padding: 7px 12px;
+    font: inherit; font-size: 0.82rem; cursor: pointer;
   }
-  header p {
-    color: var(--text-dim);
-    margin: 4px 0;
-    font-size: 0.92rem;
+  .icon-btn:hover { color: var(--ink); }
+
+  /* ── control row (scopes everything below it) ────────────── */
+  .controls {
+    display: flex; flex-wrap: wrap; gap: 20px 32px; align-items: flex-end;
+    padding: 18px 0 20px; border-bottom: 1px solid var(--hairline); margin-bottom: 24px;
   }
-  main {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 0 24px 64px;
+  .ctl-label {
+    font-size: 0.72rem; letter-spacing: 0.06em; color: var(--muted);
+    text-transform: uppercase; margin-bottom: 7px;
   }
-  section {
-    background: var(--panel);
-    border: 1px solid var(--panel-border);
-    border-radius: 12px;
-    padding: 20px 24px;
-    margin-bottom: 20px;
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tab {
+    background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px;
+    padding: 7px 13px; font: inherit; font-size: 0.85rem; color: var(--ink-2);
+    cursor: pointer; text-align: left; line-height: 1.35;
   }
-  section h2 {
-    font-size: 1.05rem;
-    margin: 0 0 4px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  .tab .tab-sub { display: block; font-size: 0.72rem; color: var(--muted); }
+  .tab[aria-selected="true"] {
+    border-color: var(--series-1); background: var(--tab-active); color: var(--ink); font-weight: 600;
   }
-  section .desc {
-    color: var(--text-dim);
-    font-size: 0.85rem;
-    margin: 0 0 16px;
+  .tab[disabled] { opacity: 0.5; cursor: not-allowed; }
+  .seg { display: inline-flex; border: 1px solid var(--hairline); border-radius: 8px; overflow: hidden; }
+  .seg button {
+    background: var(--surface); border: 0; border-right: 1px solid var(--hairline);
+    padding: 8px 15px; font: inherit; font-size: 0.85rem; color: var(--ink-2); cursor: pointer;
   }
-  .scenario-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 12px;
+  .seg button:last-child { border-right: 0; }
+  .seg button[aria-pressed="true"] { background: var(--tab-active); color: var(--ink); font-weight: 600; }
+
+  /* ── stat tiles ─────────────────────────────────────────── */
+  .tiles {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(214px, 1fr));
+    gap: 14px; margin-bottom: 26px;
   }
-  .scenario-grid .item {
-    background: #1e222b;
-    border: 1px solid var(--panel-border);
-    border-radius: 8px;
-    padding: 10px 14px;
+  .tile {
+    background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 12px; padding: 16px 18px 12px;
   }
-  .scenario-grid .item .label {
-    font-size: 0.75rem;
-    color: var(--text-dim);
+  .tile .t-label { font-size: 0.82rem; color: var(--ink-2); }
+  .tile .t-sub { font-size: 0.72rem; color: var(--muted); margin-top: 1px; }
+  .tile .t-value { font-size: 2.3rem; font-weight: 600; line-height: 1.15; margin-top: 10px; letter-spacing: -0.02em; }
+  .tile .t-unit { font-size: 0.95rem; font-weight: 500; color: var(--ink-2); margin-left: 3px; }
+  .tile .t-delta { font-size: 0.76rem; color: var(--ink-2); margin-top: 2px; }
+  .tile .t-spark { margin-top: 8px; display: block; }
+
+  /* ── chart cards ────────────────────────────────────────── */
+  .card {
+    background: var(--surface); border: 1px solid var(--hairline);
+    border-radius: 12px; padding: 20px 22px 16px; margin-bottom: 18px;
   }
-  .scenario-grid .item .value {
-    font-size: 1rem;
-    margin-top: 2px;
+  .card-head { display: flex; align-items: flex-start; gap: 14px; flex-wrap: wrap; margin-bottom: 2px; }
+  .card h2 { font-size: 1.02rem; margin: 0; font-weight: 600; }
+  .card .desc { color: var(--ink-2); font-size: 0.83rem; margin: 3px 0 12px; max-width: 72ch; }
+  .view-toggle { margin-left: auto; }
+  .view-toggle button { padding: 5px 12px; font-size: 0.78rem; }
+
+  .plot { position: relative; }
+  .plot svg { display: block; width: 100%; }
+  .plot:focus-visible { outline: 2px solid var(--series-1); outline-offset: 3px; border-radius: 6px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-top: 10px; font-size: 0.8rem; color: var(--ink-2); }
+  .legend .key { display: inline-flex; align-items: center; gap: 7px; }
+  .legend .sw-rect { width: 11px; height: 11px; border-radius: 2px; flex: none; }
+  .legend .sw-line { width: 15px; height: 2px; border-radius: 1px; flex: none; }
+
+  .tooltip {
+    position: absolute; pointer-events: none; opacity: 0; transition: opacity .1s;
+    background: var(--surface); border: 1px solid var(--hairline); border-radius: 8px;
+    padding: 8px 11px; font-size: 0.79rem; min-width: 150px; z-index: 5;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.13);
   }
-  svg { width: 100%; height: auto; display: block; }
-  .legend {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-    font-size: 0.8rem;
-    color: var(--text-dim);
-    margin-top: 8px;
-  }
-  .legend span { display: inline-flex; align-items: center; gap: 6px; }
-  .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.88rem;
-  }
-  th, td {
-    text-align: right;
-    padding: 8px 10px;
-    border-bottom: 1px solid var(--panel-border);
-  }
+  .tooltip .tt-year { color: var(--muted); font-size: 0.73rem; margin-bottom: 4px; }
+  .tooltip .tt-row { display: flex; align-items: baseline; gap: 8px; white-space: nowrap; }
+  .tooltip .tt-row + .tt-row { margin-top: 2px; }
+  .tooltip .tt-key { width: 13px; height: 2px; border-radius: 1px; flex: none; align-self: center; }
+  .tooltip .tt-val { font-weight: 600; font-variant-numeric: tabular-nums; margin-left: auto; }
+  .tooltip .tt-name { color: var(--ink-2); }
+  .tooltip .tt-sum { border-top: 1px solid var(--hairline); margin-top: 5px; padding-top: 5px; }
+
+  /* ── tables ─────────────────────────────────────────────── */
+  .table-wrap { max-height: 340px; overflow: auto; margin-top: 4px; border: 1px solid var(--hairline); border-radius: 8px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.83rem; font-variant-numeric: tabular-nums; }
+  th, td { text-align: right; padding: 7px 12px; white-space: nowrap; }
   th:first-child, td:first-child { text-align: left; }
-  th { color: var(--text-dim); font-weight: 500; }
-  .diff-ok { color: var(--good); }
-  .diff-warn { color: var(--warn); }
-  footer {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 0 24px 48px;
-    color: var(--text-dim);
-    font-size: 0.8rem;
+  thead th {
+    position: sticky; top: 0; background: var(--surface); color: var(--muted);
+    font-weight: 500; font-size: 0.76rem; border-bottom: 1px solid var(--axis);
   }
-  footer a { color: var(--accent); }
-  #status { color: var(--text-dim); font-size: 0.9rem; }
+  tbody tr + tr td { border-top: 1px solid var(--grid); }
+  .cmp-table { border: 1px solid var(--hairline); border-radius: 8px; overflow: hidden; }
+  .cmp-table table { font-size: 0.86rem; }
+  .cmp-table td:first-child { font-variant-numeric: normal; }
+  .badge { font-size: 0.76rem; color: var(--ok); white-space: nowrap; }
+  .badge::before { content: "✓ "; }
+
+  /* ── method / footer ────────────────────────────────────── */
+  .method { font-size: 0.84rem; color: var(--ink-2); }
+  .method h2 { font-size: 1.02rem; color: var(--ink); margin: 0 0 8px; font-weight: 600; }
+  .method p { margin: 0 0 9px; max-width: 76ch; }
+  .method dl { display: grid; grid-template-columns: max-content 1fr; gap: 4px 16px; margin: 0 0 4px; }
+  .method dt { color: var(--muted); font-size: 0.79rem; }
+  .method dd { margin: 0; }
+  footer { padding: 8px 0 56px; color: var(--muted); font-size: 0.79rem; }
+  .hidden { display: none !important; }
+  @media (max-width: 560px) {
+    h1 { font-size: 1.3rem; }
+    .tile .t-value { font-size: 1.9rem; }
+    .card { padding: 16px 14px 12px; }
+  }
 </style>
 </head>
 <body>
 
-<header>
-  <h1>公的年金財政検証2024 再現ダッシュボード <span style="color:var(--text-dim); font-weight:400;">(v1)</span></h1>
-  <p>厚生労働省公開の財政検証プログラム(C/C++)をGitHub Actions上でビルド・実行し、標準シナリオの長期収支見通しを再現したものです。</p>
-  <p>⚠️ 検証・研究目的の再現実装であり、公式の財政検証結果と完全に一致することを保証するものではありません。政策判断には必ず<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/nenkin/nenkin/zaisei-kensyo/index.html" style="color:var(--accent)">厚生労働省の公式発表</a>を参照してください。</p>
-</header>
-
-<main>
-
-  <section id="scenario-section">
-    <h2>📋 実行シナリオ</h2>
-    <p class="desc">今回再現した試算の内部パラメータと、対応する公式シナリオ名。</p>
-    <div class="scenario-grid" id="scenario-grid"></div>
-  </section>
-
-  <section>
-    <h2>📈 所得代替率の将来見通し</h2>
-    <p class="desc">モデル年金(夫婦2人)の所得代替率。マクロ経済スライドによる給付水準調整が終了すると横ばいになる。</p>
-    <svg id="chart-replacement" viewBox="0 0 900 340" preserveAspectRatio="xMidYMid meet"></svg>
-    <div class="legend">
-      <span><i class="swatch" style="background:#4da3ff"></i>所得代替率(合計)</span>
-      <span><i class="swatch" style="background:#4caf7d"></i>うち報酬比例部分</span>
-      <span><i class="swatch" style="background:#ff9f4d"></i>うち基礎年金部分</span>
+<div class="wrap">
+  <header>
+    <div class="titlebar">
+      <div>
+        <h1>公的年金財政検証2024 再現ダッシュボード</h1>
+        <p class="lede">厚生労働省が公開する財政検証プログラム（C/C++、5モジュール）をGitHub Actions上で再ビルド・実行し、長期の給付水準と財政見通しを算出したものです。算出値は「財政検証結果レポート2024」の公表値と突き合わせています。</p>
+      </div>
+      <button class="icon-btn" id="theme-btn" type="button">◐ テーマ</button>
     </div>
-  </section>
+    <p class="note-warn">検証・研究目的の再現実装です。公式の財政検証結果と完全に一致することを保証するものではありません。政策判断には必ず<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/nenkin/nenkin/zaisei-kensyo/index.html">厚生労働省の公式発表</a>を参照してください。</p>
+  </header>
 
-  <section>
-    <h2>💰 積立金の見通し(厚生年金・全制度合算)</h2>
-    <p class="desc">年度末積立金残高。単位: 兆円(名目)。2024〜2070年度を表示(モデル自体は2125年度まで計算)。</p>
-    <svg id="chart-reserve" viewBox="0 0 900 340" preserveAspectRatio="xMidYMid meet"></svg>
-  </section>
-
-  <section>
-    <h2>⚖️ 収支の見通し(厚生年金・全制度合算)</h2>
-    <p class="desc">収入計と支出計の推移。単位: 兆円(名目)。2024〜2070年度を表示(モデル自体は2125年度まで計算)。</p>
-    <svg id="chart-balance" viewBox="0 0 900 340" preserveAspectRatio="xMidYMid meet"></svg>
-    <div class="legend">
-      <span><i class="swatch" style="background:#4da3ff"></i>収入計</span>
-      <span><i class="swatch" style="background:#e05c5c"></i>支出計</span>
+  <!-- One control row, above everything it scopes. -->
+  <div class="controls">
+    <div>
+      <div class="ctl-label" id="lbl-scenario">経済前提シナリオ</div>
+      <div class="tabs" id="scenario-tabs" role="tablist" aria-labelledby="lbl-scenario"></div>
     </div>
-  </section>
+    <div>
+      <div class="ctl-label" id="lbl-range">表示期間</div>
+      <div class="seg" id="range-seg" role="group" aria-labelledby="lbl-range">
+        <button type="button" data-max="2070" aria-pressed="true">2024〜2070年度</button>
+        <button type="button" data-max="2125" aria-pressed="false">全期間（〜2125年度）</button>
+      </div>
+    </div>
+  </div>
 
-  <section>
-    <h2>🔍 公式レポートとの突合</h2>
-    <p class="desc">厚生労働省「財政検証結果レポート2024」との比較。詳細は
-      <a href="https://www.mhlw.go.jp/content/12500000/2024report3.pdf" style="color:var(--accent)">第3章PDF</a>
-      第7節「令和6(2024)年財政検証結果」を参照。</p>
-    <table id="compare-table">
-      <thead>
-        <tr><th>指標</th><th>本再現実装</th><th>公式値</th><th>差</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </section>
+  <main id="main">
+    <div class="tiles" id="tiles"></div>
 
-  <section>
-    <h2 id="status-heading">ℹ️ データについて</h2>
-    <p id="status">読み込み中...</p>
-  </section>
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>所得代替率の内訳</h2>
+          <p class="desc">モデル年金（夫婦2人）の手取り賃金に対する比率。積み上げの高さが所得代替率で、上端の推移が給付水準そのものを表します。報酬比例部分は調整対象外のため横ばいで、低下分はすべて基礎年金部分から生じます。</p>
+        </div>
+        <div class="seg view-toggle" role="group" aria-label="所得代替率の表示形式">
+          <button type="button" data-view="chart" data-target="rep" aria-pressed="true">グラフ</button>
+          <button type="button" data-view="table" data-target="rep" aria-pressed="false">表</button>
+        </div>
+      </div>
+      <div class="plot" id="plot-rep" tabindex="0" role="img"></div>
+      <div class="legend" id="legend-rep"></div>
+      <div class="table-wrap hidden" id="table-rep"></div>
+    </section>
 
-</main>
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>年度末積立金（厚生年金・全制度合算）</h2>
+          <p class="desc">各年度末の積立金残高。名目額のため、物価・賃金の上昇に伴って長期には金額そのものが増加します。</p>
+        </div>
+        <div class="seg view-toggle" role="group" aria-label="積立金の表示形式">
+          <button type="button" data-view="chart" data-target="res" aria-pressed="true">グラフ</button>
+          <button type="button" data-view="table" data-target="res" aria-pressed="false">表</button>
+        </div>
+      </div>
+      <div class="plot" id="plot-res" tabindex="0" role="img"></div>
+      <div class="table-wrap hidden" id="table-res"></div>
+    </section>
 
-<footer>
-  <p>ソース: <a href="https://github.com/s-ushijima/nenkin-zaisei-2024">s-ushijima/nenkin-zaisei-2024</a> ―
-  元プログラムは厚生労働省「<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/nenkin/nenkin/zaisei-kensyo/index.html">財政検証（2024（令和6）年）関連資料</a>」を出典とします。</p>
-</footer>
+    <section class="card">
+      <div class="card-head">
+        <div>
+          <h2>収入と支出（厚生年金・全制度合算）</h2>
+          <p class="desc">保険料・国庫負担・運用収入を含む収入計と、給付・拠出金を含む支出計。いずれも名目額です。</p>
+        </div>
+        <div class="seg view-toggle" role="group" aria-label="収支の表示形式">
+          <button type="button" data-view="chart" data-target="bal" aria-pressed="true">グラフ</button>
+          <button type="button" data-view="table" data-target="bal" aria-pressed="false">表</button>
+        </div>
+      </div>
+      <div class="plot" id="plot-bal" tabindex="0" role="img"></div>
+      <div class="legend" id="legend-bal"></div>
+      <div class="table-wrap hidden" id="table-bal"></div>
+    </section>
+
+    <section class="card">
+      <h2>公式レポートとの突合</h2>
+      <p class="desc">厚生労働省「財政検証結果レポート2024」<a href="https://www.mhlw.go.jp/content/12500000/2024report3.pdf">第3章</a>の第3-7-6図・第3-7-10図に掲載された値との比較。公式値は小数第1位までの公表です。</p>
+      <div class="cmp-table">
+        <table>
+          <thead>
+            <tr><th>指標</th><th>本再現実装</th><th>公式値</th><th>差</th></tr>
+          </thead>
+          <tbody id="cmp-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="card method">
+      <h2>この試算について</h2>
+      <dl id="meta-dl"></dl>
+      <p id="method-note"></p>
+    </section>
+  </main>
+
+  <footer>
+    <p>ソース: <a href="https://github.com/s-ushijima/nenkin-zaisei-2024">s-ushijima/nenkin-zaisei-2024</a> ／ 元プログラムは厚生労働省「<a href="https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/nenkin/nenkin/zaisei-kensyo/index.html">財政検証（2024（令和6）年）関連資料</a>」を出典とします。</p>
+  </footer>
+</div>
 
 <script>
+"use strict";
+
 const DATA_URL = "data/scenario_1000.json";
+const NS = "http://www.w3.org/2000/svg";
 
-function fmt(n, digits = 1) {
-  if (n === null || n === undefined || Number.isNaN(n)) return "-";
-  return n.toLocaleString("ja-JP", { minimumFractionDigits: digits, maximumFractionDigits: digits });
+const PALETTE = {
+  light: { s1: "#2a78d6", s2: "#eb6834", surface: "#fcfcfb", grid: "#e1e0d9", axis: "#c3c2b7", muted: "#898781", ink: "#0b0b0b", ink2: "#52514e" },
+  dark:  { s1: "#3987e5", s2: "#d95926", surface: "#1a1a19", grid: "#2c2c2a", axis: "#383835", muted: "#898781", ink: "#ffffff", ink2: "#c3c2b7" }
+};
+
+const state = { data: null, maxYear: 2070, views: { rep: "chart", res: "chart", bal: "chart" } };
+
+/* ── helpers ─────────────────────────────────────────────── */
+function mode() {
+  const t = document.documentElement.dataset.theme;
+  if (t === "dark" || t === "light") return t;
+  return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
 }
+const pal = () => PALETTE[mode()];
 
-function makeLineChart(svgEl, series, opts) {
-  const W = 900, H = 340, padL = 50, padR = 20, padT = 20, padB = 36;
-  const years = series[0].points.map(p => p.x);
-  const xMin = Math.min(...years), xMax = Math.max(...years);
-  let yMin = Infinity, yMax = -Infinity;
-  series.forEach(s => s.points.forEach(p => {
-    if (p.y === null || p.y === undefined) return;
-    if (p.y < yMin) yMin = p.y;
-    if (p.y > yMax) yMax = p.y;
-  }));
-  if (opts && opts.yMinZero) yMin = Math.min(0, yMin);
-  const yPad = (yMax - yMin) * 0.08 || 1;
-  yMin -= yPad; yMax += yPad;
+function el(tag, attrs, text) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) if (attrs[k] !== null && attrs[k] !== undefined) n.setAttribute(k, attrs[k]);
+  if (text !== undefined) n.textContent = text;   // labels are data — never innerHTML
+  return n;
+}
+function h(tag, cls, text) {
+  const n = document.createElement(tag);
+  if (cls) n.className = cls;
+  if (text !== undefined) n.textContent = text;
+  return n;
+}
+const num = (v, d = 1) => v.toLocaleString("ja-JP", { minimumFractionDigits: d, maximumFractionDigits: d });
+const clear = (n) => { while (n.firstChild) n.removeChild(n.firstChild); };
 
-  const x = v => padL + (v - xMin) / (xMax - xMin) * (W - padL - padR);
-  const y = v => H - padB - (v - yMin) / (yMax - yMin) * (H - padT - padB);
-
-  let svg = "";
-  // gridlines + y labels
-  const gridN = 5;
-  for (let i = 0; i <= gridN; i++) {
-    const gv = yMin + (yMax - yMin) * i / gridN;
-    const gy = y(gv);
-    svg += `<line x1="${padL}" y1="${gy}" x2="${W-padR}" y2="${gy}" stroke="#2a2f3a" stroke-width="1"/>`;
-    svg += `<text x="${padL-8}" y="${gy+4}" text-anchor="end" font-size="11" fill="#9aa1ad">${fmt(gv, opts && opts.yDigits !== undefined ? opts.yDigits : 0)}</text>`;
+/* Nice round axis ticks from 0. Picks the smallest nice step that keeps the
+   tick count within MAX_TICKS, so the top tick always covers the data (a step
+   chosen from max/count alone can land below the peak and let marks escape the
+   plot) without leaving a wasteful amount of headroom. */
+const MAX_TICKS = 7;
+function ticks(max) {
+  const mag = Math.pow(10, Math.floor(Math.log10(Math.max(max, 1e-9))) - 1);
+  const out = [];
+  let step = 10 * mag;
+  for (const m of [1, 2, 2.5, 5, 10, 20, 25, 50, 100]) {
+    step = m * mag;
+    if (Math.ceil(max / step) <= MAX_TICKS) break;
   }
-  // x labels
-  const xTicks = [];
-  for (let yr = Math.ceil(xMin/10)*10; yr <= xMax; yr += 10) xTicks.push(yr);
-  xTicks.forEach(t => {
-    svg += `<text x="${x(t)}" y="${H-padB+18}" text-anchor="middle" font-size="11" fill="#9aa1ad">${t}</text>`;
-  });
-
-  series.forEach(s => {
-    const pts = s.points.filter(p => p.y !== null && p.y !== undefined);
-    const d = pts.map((p, i) => `${i===0?'M':'L'}${x(p.x).toFixed(1)},${y(p.y).toFixed(1)}`).join(" ");
-    svg += `<path d="${d}" fill="none" stroke="${s.color}" stroke-width="2.2"/>`;
-  });
-
-  svgEl.innerHTML = svg;
+  const top = Math.ceil(max / step) * step;
+  for (let i = 0; i * step <= top + 1e-9; i++) out.push(i * step);
+  return out;
 }
+
+/* ── chart renderer ──────────────────────────────────────────
+   cfg = { rows, x, bands?, lines?, unit, digits, annotate?, ariaLabel }
+   `bands` renders a stacked area (parts sum to the top edge);
+   `lines` renders one 2px line per series. Both share the crosshair layer. */
+function renderChart(host, cfg) {
+  const P = pal();
+  const W = Math.max(320, host.clientWidth || 880);
+  const H = 300, padL = 52, padR = 74, padT = 18, padB = 34;
+  const GAP = 2;                                  // surface gap between stacked bands
+  const rows = cfg.rows;
+  if (!rows.length) return;
+
+  const xs = rows.map(cfg.x);
+  const xMin = xs[0], xMax = xs[xs.length - 1];
+  const series = cfg.bands || cfg.lines;
+
+  let yMax = 0;
+  for (const r of rows) {
+    const v = cfg.bands ? cfg.bands.reduce((s, b) => s + b.get(r), 0)
+                        : Math.max(...cfg.lines.map(l => l.get(r)));
+    if (v > yMax) yMax = v;
+  }
+  const tk = ticks(yMax);
+  const yTop = tk[tk.length - 1];
+
+  const X = v => padL + (v - xMin) / (xMax - xMin) * (W - padL - padR);
+  const Y = v => H - padB - (v / yTop) * (H - padT - padB);
+
+  const svg = el("svg", { width: W, height: H, viewBox: `0 0 ${W} ${H}`, "aria-hidden": "true" });
+
+  // gridlines (solid hairlines, one step off surface) + y ticks
+  for (const t of tk) {
+    svg.appendChild(el("line", { x1: padL, y1: Y(t), x2: W - padR, y2: Y(t), stroke: t === 0 ? P.axis : P.grid, "stroke-width": 1 }));
+    svg.appendChild(el("text", { x: padL - 9, y: Y(t) + 4, "text-anchor": "end", "font-size": 11, fill: P.muted, "font-variant-numeric": "tabular-nums" }, num(t, 0)));
+  }
+  // x ticks every 10 years
+  for (let yr = Math.ceil(xMin / 10) * 10; yr <= xMax; yr += 10) {
+    svg.appendChild(el("text", { x: X(yr), y: H - padB + 19, "text-anchor": "middle", "font-size": 11, fill: P.muted, "font-variant-numeric": "tabular-nums" }, String(yr)));
+  }
+
+  const color = s => P[s.slot];
+
+  if (cfg.bands) {
+    // stacked bands, bottom-up; each upper band is inset by GAP so the surface
+    // does the separating (never a stroke drawn around the mark)
+    const cum = rows.map(() => 0);
+    cfg.bands.forEach((b, bi) => {
+      const lower = rows.map((r, i) => cum[i]);
+      rows.forEach((r, i) => { cum[i] += b.get(r); });
+      const top = rows.map((r, i) => cum[i]);
+      let d = "";
+      rows.forEach((r, i) => { d += (i ? "L" : "M") + X(cfg.x(r)).toFixed(1) + "," + Y(top[i]).toFixed(1); });
+      for (let i = rows.length - 1; i >= 0; i--) {
+        const yb = bi === 0 ? Y(lower[i]) : Y(lower[i]) - GAP;
+        d += "L" + X(cfg.x(rows[i])).toFixed(1) + "," + yb.toFixed(1);
+      }
+      svg.appendChild(el("path", { d: d + "Z", fill: color(b), "fill-opacity": mode() === "dark" ? 0.20 : 0.15 }));
+      let ld = "";
+      rows.forEach((r, i) => { ld += (i ? "L" : "M") + X(cfg.x(r)).toFixed(1) + "," + Y(top[i]).toFixed(1); });
+      svg.appendChild(el("path", { d: ld, fill: "none", stroke: color(b), "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    });
+  } else {
+    for (const l of cfg.lines) {
+      let d = "", a = "";
+      rows.forEach((r, i) => { d += (i ? "L" : "M") + X(cfg.x(r)).toFixed(1) + "," + Y(l.get(r)).toFixed(1); });
+      if (cfg.lines.length === 1) {
+        a = d + `L${X(xMax).toFixed(1)},${Y(0).toFixed(1)}L${X(xMin).toFixed(1)},${Y(0).toFixed(1)}Z`;
+        svg.appendChild(el("path", { d: a, fill: color(l), "fill-opacity": 0.10 }));
+      }
+      svg.appendChild(el("path", { d, fill: "none", stroke: color(l), "stroke-width": 2, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+    }
+  }
+
+  // annotation marker (e.g. the year the benefit-level adjustment ends)
+  if (cfg.annotate && cfg.annotate.year >= xMin && cfg.annotate.year <= xMax) {
+    const ax = X(cfg.annotate.year);
+    svg.appendChild(el("line", { x1: ax, y1: padT + 14, x2: ax, y2: H - padB, stroke: P.axis, "stroke-width": 1 }));
+    svg.appendChild(el("text", { x: ax + 5, y: padT + 11, "font-size": 11, fill: P.ink2 }, cfg.annotate.label));
+  }
+
+  // selective direct labels: first and last value of the headline series only
+  const headline = cfg.bands
+    ? { get: r => cfg.bands.reduce((s, b) => s + b.get(r), 0), slot: cfg.bands[cfg.bands.length - 1].slot }
+    : cfg.lines[cfg.lines.length - 1];
+  for (const l of (cfg.lines || [headline])) {
+    const last = rows[rows.length - 1], v = l.get(last);
+    svg.appendChild(el("circle", { cx: X(xMax), cy: Y(v), r: 4, fill: color(l), stroke: P.surface, "stroke-width": 2 }));
+    svg.appendChild(el("text", { x: X(xMax) + 9, y: Y(v) + 4, "font-size": 12, fill: P.ink, "font-weight": 600 }, num(v, cfg.digits) + cfg.unit));
+  }
+  if (cfg.bands) {
+    const first = rows[0], v0 = headline.get(first);
+    svg.appendChild(el("circle", { cx: X(xMin), cy: Y(v0), r: 4, fill: color(headline), stroke: P.surface, "stroke-width": 2 }));
+    svg.appendChild(el("text", { x: X(xMin) + 8, y: Y(v0) - 9, "font-size": 12, fill: P.ink, "font-weight": 600 }, num(v0, cfg.digits) + cfg.unit));
+  }
+
+  // crosshair layer
+  const cross = el("line", { x1: 0, y1: padT, x2: 0, y2: H - padB, stroke: P.axis, "stroke-width": 1, opacity: 0 });
+  svg.appendChild(cross);
+  const dots = series.map(s => {
+    const c = el("circle", { r: 4.5, fill: color(s), stroke: P.surface, "stroke-width": 2, opacity: 0 });
+    svg.appendChild(c); return c;
+  });
+
+  clear(host);
+  host.appendChild(svg);
+  host.setAttribute("aria-label", cfg.ariaLabel);
+
+  const tip = h("div", "tooltip");
+  host.appendChild(tip);
+
+  let idx = -1;
+  const show = (i) => {
+    if (i < 0 || i >= rows.length) return;
+    idx = i;
+    const r = rows[i], px = X(cfg.x(r));
+    cross.setAttribute("x1", px); cross.setAttribute("x2", px); cross.setAttribute("opacity", 1);
+
+    clear(tip);
+    tip.appendChild(h("div", "tt-year", cfg.x(r) + "年度"));
+    let acc = 0;
+    series.forEach((s, si) => {
+      const v = s.get(r);
+      if (cfg.bands) acc += v;
+      const row = h("div", "tt-row");
+      const key = h("span", "tt-key"); key.style.background = color(s);
+      row.appendChild(key);
+      row.appendChild(h("span", "tt-name", s.name));
+      row.appendChild(h("span", "tt-val", num(v, cfg.digits) + cfg.unit));
+      tip.appendChild(row);
+      dots[si].setAttribute("cx", px);
+      dots[si].setAttribute("cy", Y(cfg.bands ? acc : v));
+      dots[si].setAttribute("opacity", 1);
+    });
+    if (cfg.summary) {
+      const s = cfg.summary(r);
+      const row = h("div", "tt-row tt-sum");
+      row.appendChild(h("span", "tt-name", s.name));
+      row.appendChild(h("span", "tt-val", s.value));
+      tip.appendChild(row);
+    }
+    tip.style.opacity = 1;
+    const scale = host.clientWidth / W;
+    const left = px * scale;
+    tip.style.left = Math.min(Math.max(left + 14, 0), host.clientWidth - tip.offsetWidth - 4) + "px";
+    tip.style.top = "8px";
+  };
+  const hide = () => {
+    cross.setAttribute("opacity", 0);
+    dots.forEach(d => d.setAttribute("opacity", 0));
+    tip.style.opacity = 0;
+  };
+  const nearest = (clientX) => {
+    const box = host.getBoundingClientRect();
+    const xv = (clientX - box.left) / (box.width / W);
+    const t = xMin + (xv - padL) / (W - padL - padR) * (xMax - xMin);
+    let best = 0, bd = Infinity;
+    rows.forEach((r, i) => { const d = Math.abs(cfg.x(r) - t); if (d < bd) { bd = d; best = i; } });
+    return best;
+  };
+
+  host.onpointermove = (e) => show(nearest(e.clientX));
+  host.onpointerleave = hide;
+  host.onblur = hide;
+  host.onfocus = () => show(idx < 0 ? 0 : idx);
+  host.onkeydown = (e) => {                       // keyboard parity with hover
+    const k = e.key;
+    if (k === "ArrowRight" || k === "ArrowLeft") { show(Math.min(rows.length - 1, Math.max(0, idx + (k === "ArrowRight" ? 1 : -1)))); e.preventDefault(); }
+    else if (k === "Home") { show(0); e.preventDefault(); }
+    else if (k === "End") { show(rows.length - 1); e.preventDefault(); }
+    else if (k === "Escape") hide();
+  };
+}
+
+function renderLegend(host, items) {
+  clear(host);
+  for (const it of items) {
+    const k = h("span", "key");
+    const sw = h("span", it.type === "line" ? "sw-line" : "sw-rect");
+    sw.style.background = pal()[it.slot];
+    k.appendChild(sw);
+    k.appendChild(h("span", null, it.name));
+    host.appendChild(k);
+  }
+}
+
+function renderTable(host, cols, rows) {
+  clear(host);
+  const t = h("table");
+  const thead = h("thead"), tr = h("tr");
+  for (const c of cols) tr.appendChild(h("th", null, c.name));
+  thead.appendChild(tr); t.appendChild(thead);
+  const tb = h("tbody");
+  for (const r of rows) {
+    const line = h("tr");
+    for (const c of cols) line.appendChild(h("td", null, c.get(r)));
+    tb.appendChild(line);
+  }
+  t.appendChild(tb); host.appendChild(t);
+}
+
+function sparkline(values, width, height) {
+  const P = pal();
+  const svg = el("svg", { width, height, viewBox: `0 0 ${width} ${height}`, class: "t-spark", "aria-hidden": "true" });
+  const lo = Math.min(...values), hi = Math.max(...values), span = hi - lo || 1;
+  const X = i => (i / (values.length - 1)) * (width - 6) + 3;
+  const Y = v => height - 3 - ((v - lo) / span) * (height - 6);
+  let d = "";
+  values.forEach((v, i) => { d += (i ? "L" : "M") + X(i).toFixed(1) + "," + Y(v).toFixed(1); });
+  svg.appendChild(el("path", { d, fill: "none", stroke: P.s1, "stroke-width": 1.5, opacity: 0.45, "stroke-linejoin": "round", "stroke-linecap": "round" }));
+  svg.appendChild(el("circle", { cx: X(0), cy: Y(values[0]), r: 2.5, fill: P.s1 }));
+  return svg;
+}
+
+/* ── page render ─────────────────────────────────────────── */
+function inRange(rows) { return rows.filter(r => r.year <= state.maxYear); }
+function sample(rows, get, n) {
+  const step = Math.max(1, Math.floor(rows.length / n));
+  const out = [];
+  for (let i = 0; i < rows.length; i += step) out.push(get(rows[i]));
+  return out;
+}
+
+function render() {
+  const d = state.data;
+  const rep = inRange(d.replacement_rate);
+  const bal = inRange(d.balance);
+
+  // stat tiles
+  const tiles = document.getElementById("tiles");
+  clear(tiles);
+  const sparkSrc = {
+    replacement_total: () => sample(rep, r => r.total, 16),
+    reserve: () => sample(bal, r => r.reserve_trillion_yen, 16),
+    funded_ratio: () => sample(bal, r => r.funded_ratio_years, 16)
+  };
+  for (const k of d.kpis) {
+    const tile = h("div", "tile");
+    tile.appendChild(h("div", "t-label", k.label));
+    tile.appendChild(h("div", "t-sub", k.sub));
+    const val = h("div", "t-value", k.value);
+    val.appendChild(h("span", "t-unit", k.unit));
+    tile.appendChild(val);
+    tile.appendChild(h("div", "t-delta", k.delta || " "));
+    const vals = sparkSrc[k.spark] && sparkSrc[k.spark]();
+    if (vals && vals.length > 1) tile.appendChild(sparkline(vals, 168, 26));
+    tiles.appendChild(tile);
+  }
+
+  // 所得代替率 — stacked: the two parts sum to the replacement rate
+  const repBands = [
+    { name: "報酬比例部分", slot: "s1", get: r => r.proportional },
+    { name: "基礎年金部分（2人分）", slot: "s2", get: r => r.basic }
+  ];
+  renderChart(document.getElementById("plot-rep"), {
+    rows: rep, x: r => r.year, bands: repBands, unit: "%", digits: 1,
+    annotate: d.adjustment_end.year <= state.maxYear
+      ? { year: d.adjustment_end.year, label: d.adjustment_end.label } : null,
+    summary: r => ({ name: "所得代替率", value: num(r.total, 1) + "%" }),
+    ariaLabel: `所得代替率の推移。${rep[0].year}年度${num(rep[0].total, 1)}パーセントから${d.adjustment_end.year}年度に${num(d.adjustment_end.total, 1)}パーセントまで低下し、以降横ばい。同じ値は下の表でも読めます。`
+  });
+  renderLegend(document.getElementById("legend-rep"), repBands.map(b => ({ ...b, type: "rect" })));
+  renderTable(document.getElementById("table-rep"), [
+    { name: "年度", get: r => r.year },
+    { name: "所得代替率 (%)", get: r => num(r.total, 2) },
+    { name: "うち報酬比例 (%)", get: r => num(r.proportional, 2) },
+    { name: "うち基礎年金 (%)", get: r => num(r.basic, 2) }
+  ], rep);
+
+  // 積立金 — single series, so no legend box (the heading names it)
+  renderChart(document.getElementById("plot-res"), {
+    rows: bal, x: r => r.year,
+    lines: [{ name: "年度末積立金", slot: "s1", get: r => r.reserve_trillion_yen }],
+    unit: "兆円", digits: 0,
+    summary: r => ({ name: "積立度合", value: num(r.funded_ratio_years, 1) + "年分" }),
+    ariaLabel: `年度末積立金の推移。${bal[0].year}年度${num(bal[0].reserve_trillion_yen, 0)}兆円から${bal[bal.length - 1].year}年度${num(bal[bal.length - 1].reserve_trillion_yen, 0)}兆円へ増加。同じ値は下の表でも読めます。`
+  });
+  renderTable(document.getElementById("table-res"), [
+    { name: "年度", get: r => r.year },
+    { name: "年度末積立金 (兆円)", get: r => num(r.reserve_trillion_yen, 1) },
+    { name: "積立度合 (年分)", get: r => num(r.funded_ratio_years, 2) }
+  ], bal);
+
+  // 収支
+  const balLines = [
+    { name: "収入計", slot: "s1", get: r => r.income_trillion_yen },
+    { name: "支出計", slot: "s2", get: r => r.expense_trillion_yen }
+  ];
+  renderChart(document.getElementById("plot-bal"), {
+    rows: bal, x: r => r.year, lines: balLines, unit: "兆円", digits: 0,
+    summary: r => ({ name: "収支差", value: num(r.income_trillion_yen - r.expense_trillion_yen, 1) + "兆円" }),
+    ariaLabel: `収入計と支出計の推移。全期間で収入が支出を上回っています。同じ値は下の表でも読めます。`
+  });
+  renderLegend(document.getElementById("legend-bal"), balLines.map(l => ({ ...l, type: "line" })));
+  renderTable(document.getElementById("table-bal"), [
+    { name: "年度", get: r => r.year },
+    { name: "収入計 (兆円)", get: r => num(r.income_trillion_yen, 1) },
+    { name: "支出計 (兆円)", get: r => num(r.expense_trillion_yen, 1) },
+    { name: "収支差 (兆円)", get: r => num(r.income_trillion_yen - r.expense_trillion_yen, 1) }
+  ], bal);
+}
+
+function renderStatic() {
+  const d = state.data;
+
+  // scenario tabs — only the computed one is selectable; the others carry the
+  // official figure so a disabled tab still tells the reader something
+  const tabs = document.getElementById("scenario-tabs");
+  clear(tabs);
+  for (const s of d.scenarios) {
+    const b = h("button", "tab");
+    b.type = "button";
+    b.setAttribute("role", "tab");
+    b.setAttribute("aria-selected", String(!!s.computed));
+    b.appendChild(document.createTextNode(s.name));
+    b.appendChild(h("span", "tab-sub", s.computed
+      ? `econ-${s.econ}・本ページで算出`
+      : `econ-${s.econ}・未算出（公式値 ${s.official_rate}）`));
+    if (!s.computed) b.disabled = true;
+    tabs.appendChild(b);
+  }
+
+  const body = document.getElementById("cmp-body");
+  clear(body);
+  for (const r of d.official_comparison) {
+    const tr = h("tr");
+    tr.appendChild(h("td", null, r.metric));
+    tr.appendChild(h("td", null, r.model));
+    tr.appendChild(h("td", null, r.official));
+    const td = h("td");
+    if (r.match) td.appendChild(h("span", "badge", r.diff)); else td.textContent = r.diff;
+    tr.appendChild(td);
+    body.appendChild(tr);
+  }
+
+  const dl = document.getElementById("meta-dl");
+  clear(dl);
+  const meta = [
+    ["実行パラメータ", d.meta.run],
+    ["対応する公式シナリオ", d.meta.scenario_name],
+    ["人口前提", d.meta.population],
+    ["労働力率前提", d.meta.labor],
+    ["出力元ファイル", d.meta.sources.join(" / ")]
+  ];
+  for (const [k, v] of meta) { dl.appendChild(h("dt", null, k)); dl.appendChild(h("dd", null, v)); }
+
+  document.getElementById("method-note").textContent =
+    "経済前提3001が公式の「高成長実現ケース」に相当することは、(1) 第3-4-29表がケースを①〜④の順で並べており econ-3001〜3004 の並びと一致すること、(2) 各econ-NNNN.csvの実質賃金上昇率が2.0/1.5/0.5/0.1%と公式の想定と一致すること、(3) econ-3001の算出結果が公式の高成長実現ケース×中位推計人口の公表値を再現すること、の3点から確認しています。人口前提は出生中位・死亡中位で、公式レポートの中位推計に対応します。";
+}
+
+/* ── wiring ──────────────────────────────────────────────── */
+document.getElementById("theme-btn").addEventListener("click", () => {
+  document.documentElement.dataset.theme = mode() === "dark" ? "light" : "dark";
+  render();
+});
+
+document.getElementById("range-seg").addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  state.maxYear = Number(b.dataset.max);
+  for (const x of e.currentTarget.querySelectorAll("button")) x.setAttribute("aria-pressed", String(x === b));
+  render();
+});
+
+for (const seg of document.querySelectorAll(".view-toggle")) {
+  seg.addEventListener("click", (e) => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    const { view, target } = b.dataset;
+    state.views[target] = view;
+    for (const x of seg.querySelectorAll("button")) x.setAttribute("aria-pressed", String(x === b));
+    document.getElementById("plot-" + target).classList.toggle("hidden", view !== "chart");
+    document.getElementById("table-" + target).classList.toggle("hidden", view !== "table");
+    const lg = document.getElementById("legend-" + target);
+    if (lg) lg.classList.toggle("hidden", view !== "chart");
+    if (view === "chart") render();
+  });
+}
+
+let rt;
+new ResizeObserver(() => { clearTimeout(rt); rt = setTimeout(render, 120); })
+  .observe(document.getElementById("main"));
+window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", render);
 
 fetch(DATA_URL)
-  .then(r => {
-    if (!r.ok) throw new Error("data fetch failed: " + r.status);
-    return r.json();
-  })
-  .then(render)
+  .then(r => { if (!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+  .then(d => { state.data = d; renderStatic(); render(); })
   .catch(err => {
-    document.getElementById("status").textContent =
-      "データの読み込みに失敗しました (" + err.message + ")。GitHub Actions側でデータ生成が完了しているかご確認ください。";
+    const m = document.getElementById("main");
+    clear(m);
+    const box = h("section", "card");
+    box.appendChild(h("h2", null, "データを読み込めませんでした"));
+    box.appendChild(h("p", "desc", `${DATA_URL} の取得に失敗しました（${err.message}）。GitHub Actions でのデータ生成が完了しているかご確認ください。`));
+    m.appendChild(box);
   });
-
-function render(data) {
-  // scenario grid
-  const grid = document.getElementById("scenario-grid");
-  data.scenario.forEach(item => {
-    const div = document.createElement("div");
-    div.className = "item";
-    div.innerHTML = `<div class="label">${item.label}</div><div class="value">${item.value}</div>`;
-    grid.appendChild(div);
-  });
-
-  // replacement rate chart
-  makeLineChart(document.getElementById("chart-replacement"), [
-    { points: data.replacement_rate.map(p => ({x: p.year, y: p.total})), color: "#4da3ff" },
-    { points: data.replacement_rate.map(p => ({x: p.year, y: p.proportional})), color: "#4caf7d" },
-    { points: data.replacement_rate.map(p => ({x: p.year, y: p.basic})), color: "#ff9f4d" },
-  ], { yDigits: 0 });
-
-  // Reserve/income/expense are nominal yen and compound over the model's
-  // full ~100-year horizon, so a full-range chart squashes the near-term
-  // (policy-relevant) years to a sliver at the bottom. Cap the display
-  // window; 所得代替率 (a ratio, not a nominal amount) doesn't have this
-  // problem so it keeps the full horizon.
-  const nearTerm = data.balance.filter(p => p.year <= 2070);
-
-  // reserve chart
-  makeLineChart(document.getElementById("chart-reserve"), [
-    { points: nearTerm.map(p => ({x: p.year, y: p.reserve_trillion_yen})), color: "#4da3ff" },
-  ], { yMinZero: true, yDigits: 0 });
-
-  // balance chart
-  makeLineChart(document.getElementById("chart-balance"), [
-    { points: nearTerm.map(p => ({x: p.year, y: p.income_trillion_yen})), color: "#4da3ff" },
-    { points: nearTerm.map(p => ({x: p.year, y: p.expense_trillion_yen})), color: "#e05c5c" },
-  ], { yMinZero: true, yDigits: 0 });
-
-  // comparison table
-  const tbody = document.querySelector("#compare-table tbody");
-  data.official_comparison.forEach(row => {
-    const tr = document.createElement("tr");
-    const diffClass = row.diff_ok ? "diff-ok" : "diff-warn";
-    tr.innerHTML = `<td>${row.metric}</td><td>${row.model_value}</td><td>${row.official_value}</td><td class="${diffClass}">${row.diff}</td>`;
-    tbody.appendChild(tr);
-  });
-
-  document.getElementById("status").innerHTML = data.status_note;
-}
 </script>
 
 </body>

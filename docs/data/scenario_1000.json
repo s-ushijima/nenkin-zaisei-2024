@@ -1,26 +1,91 @@
 {
-  "scenario": [
+  "meta": {
+    "run": "試算番号1000 / 経済前提3001 / 外枠1000",
+    "scenario_name": "高成長実現ケース",
+    "population": "出生中位・死亡中位・入国超過16万人",
+    "labor": "労働参加進展ケース",
+    "sources": [
+      "03summary.1000-1000-3001-1000-1120-000_08sum.csv",
+      "01shushi.1000-1000-3001-1000-1120-000e_08tou.csv"
+    ]
+  },
+  "scenarios": [
     {
-      "label": "試算番号",
-      "value": "1000"
+      "econ": "3001",
+      "name": "高成長実現ケース",
+      "real_growth": "1.6%",
+      "real_wage_growth": "2.0%",
+      "official_rate": "56.9%",
+      "official_end_year": "2039年度",
+      "computed": true
     },
     {
-      "label": "経済前提番号",
-      "value": "3001"
+      "econ": "3002",
+      "name": "成長型経済移行・継続ケース",
+      "real_growth": "1.1%",
+      "real_wage_growth": "1.5%",
+      "official_rate": "57.6%",
+      "official_end_year": "2037年度",
+      "computed": false
     },
     {
-      "label": "対応する公式シナリオ(経済)",
-      "value": "高成長実現ケース"
+      "econ": "3003",
+      "name": "過去30年投影ケース",
+      "real_growth": "▲0.1%",
+      "real_wage_growth": "0.5%",
+      "official_rate": "50.4%",
+      "official_end_year": "2057年度",
+      "computed": false
     },
     {
-      "label": "人口前提",
-      "value": "出生中位・死亡中位・入国超過16万人"
-    },
-    {
-      "label": "労働力率前提",
-      "value": "労働参加進展ケース"
+      "econ": "3004",
+      "name": "1人当たりゼロ成長ケース",
+      "real_growth": "▲0.7%",
+      "real_wage_growth": "0.1%",
+      "official_rate": "—",
+      "official_end_year": "国民年金は2059年度に積立金が枯渇",
+      "computed": false
     }
   ],
+  "kpis": [
+    {
+      "label": "所得代替率",
+      "sub": "2024年度（足下）",
+      "value": "61.2",
+      "unit": "%",
+      "delta": null,
+      "spark": "replacement_total"
+    },
+    {
+      "label": "調整終了後の所得代替率",
+      "sub": "2039年度に給付水準調整が終了",
+      "value": "56.9",
+      "unit": "%",
+      "delta": "▼ 4.3pt（2024年度比）",
+      "spark": "replacement_total"
+    },
+    {
+      "label": "年度末積立金",
+      "sub": "2024年度・厚生年金全制度合算",
+      "value": "293",
+      "unit": "兆円",
+      "delta": null,
+      "spark": "reserve"
+    },
+    {
+      "label": "積立度合",
+      "sub": "2024年度・支出の何年分か",
+      "value": "5.2",
+      "unit": "年分",
+      "delta": null,
+      "spark": "funded_ratio"
+    }
+  ],
+  "adjustment_end": {
+    "year": 2039,
+    "total": 56.91,
+    "label": "2039年度 給付水準調整の終了"
+  },
   "replacement_rate": [
     {
       "year": 2024,
@@ -1353,19 +1418,53 @@
   ],
   "official_comparison": [
     {
-      "metric": "所得代替率(2024年度時点)",
-      "model_value": "61.2%",
-      "official_value": "61.2%",
+      "metric": "所得代替率（2024年度）",
+      "model": "61.18",
+      "official": "61.2",
       "diff": "-0.02pt",
-      "diff_ok": true
+      "match": true
     },
     {
-      "metric": "所得代替率(調整終了後, 2039年度)",
-      "model_value": "56.9%",
-      "official_value": "56.9%(2039年度, 中位推計人口)",
+      "metric": "　うち報酬比例部分（2024年度）",
+      "model": "24.97",
+      "official": "25.0",
+      "diff": "-0.03pt",
+      "match": true
+    },
+    {
+      "metric": "　うち基礎年金部分（2024年度）",
+      "model": "36.21",
+      "official": "36.2",
       "diff": "+0.01pt",
-      "diff_ok": true
+      "match": true
+    },
+    {
+      "metric": "所得代替率（調整終了後・2039年度）",
+      "model": "56.91",
+      "official": "56.9",
+      "diff": "+0.01pt",
+      "match": true
+    },
+    {
+      "metric": "　うち報酬比例部分（調整終了後）",
+      "model": "24.97",
+      "official": "25.0",
+      "diff": "-0.03pt",
+      "match": true
+    },
+    {
+      "metric": "　うち基礎年金部分（調整終了後）",
+      "model": "31.94",
+      "official": "31.9",
+      "diff": "+0.04pt",
+      "match": true
+    },
+    {
+      "metric": "給付水準調整の終了年度",
+      "model": "2039年度",
+      "official": "2039年度",
+      "diff": "一致",
+      "match": true
     }
-  ],
-  "status_note": "本データはGitHub Actions上で厚労省公開Cプログラムを再ビルド・実行して生成したものです。経済前提3001は厚労省「財政検証結果レポート2024」の<b>高成長実現ケース</b>に相当することを、経済前提入力CSV(実質賃金上昇率・物価上昇率・実質運用利回り)の値を4ケース分すべて突き合わせて確認しました。所得代替率は基準年度(2024年度)・調整終了後の値とも公式値と概ね一致しています。"
+  ]
 }
