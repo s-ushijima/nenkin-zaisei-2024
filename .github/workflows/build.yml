@@ -40,6 +40,11 @@ jobs:
         run: |
           rm -rf /tmp/build_bas && cp -r . /tmp/build_bas
           sed -i '/fclose( fp_in\[0\] );/d' /tmp/build_bas/main.c
+          # Same class of bug: main.c calls printout(0) then printout(1);
+          # printout.c unconditionally closes fp_out[OUTPUT] (opened once,
+          # append mode) every call, so the 2nd call double-closes it. Only
+          # close on the final call.
+          sed -i 's/fclose( fp_out\[OUTPUT\] );/if (cut_ba == 1) fclose( fp_out[OUTPUT] );/' /tmp/build_bas/printout.c
           cd /tmp/build_bas
           g++ -g -o "$GITHUB_WORKSPACE/bin/bas" \
             Atamawari.c Atamawari_cut.c cntl.c econ.c file_open.c \
