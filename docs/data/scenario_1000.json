@@ -1,0 +1,1371 @@
+{
+  "scenario": [
+    {
+      "label": "試算番号",
+      "value": "1000"
+    },
+    {
+      "label": "経済前提番号",
+      "value": "3001"
+    },
+    {
+      "label": "対応する公式シナリオ(経済)",
+      "value": "高成長実現ケース"
+    },
+    {
+      "label": "人口前提",
+      "value": "出生中位・死亡中位・入国超過16万人"
+    },
+    {
+      "label": "労働力率前提",
+      "value": "労働参加進展ケース"
+    }
+  ],
+  "replacement_rate": [
+    {
+      "year": 2024,
+      "total": 61.18,
+      "proportional": 24.97,
+      "basic": 36.21
+    },
+    {
+      "year": 2025,
+      "total": 61.05,
+      "proportional": 24.97,
+      "basic": 36.08
+    },
+    {
+      "year": 2026,
+      "total": 60.93,
+      "proportional": 24.97,
+      "basic": 35.96
+    },
+    {
+      "year": 2027,
+      "total": 60.75,
+      "proportional": 24.97,
+      "basic": 35.78
+    },
+    {
+      "year": 2028,
+      "total": 60.52,
+      "proportional": 24.97,
+      "basic": 35.55
+    },
+    {
+      "year": 2029,
+      "total": 60.26,
+      "proportional": 24.97,
+      "basic": 35.29
+    },
+    {
+      "year": 2030,
+      "total": 60.0,
+      "proportional": 24.97,
+      "basic": 35.02
+    },
+    {
+      "year": 2031,
+      "total": 59.71,
+      "proportional": 24.97,
+      "basic": 34.74
+    },
+    {
+      "year": 2032,
+      "total": 59.41,
+      "proportional": 24.97,
+      "basic": 34.44
+    },
+    {
+      "year": 2033,
+      "total": 59.1,
+      "proportional": 24.97,
+      "basic": 34.13
+    },
+    {
+      "year": 2034,
+      "total": 58.76,
+      "proportional": 24.97,
+      "basic": 33.79
+    },
+    {
+      "year": 2035,
+      "total": 58.4,
+      "proportional": 24.97,
+      "basic": 33.43
+    },
+    {
+      "year": 2036,
+      "total": 58.01,
+      "proportional": 24.97,
+      "basic": 33.04
+    },
+    {
+      "year": 2037,
+      "total": 57.62,
+      "proportional": 24.97,
+      "basic": 32.65
+    },
+    {
+      "year": 2038,
+      "total": 57.22,
+      "proportional": 24.97,
+      "basic": 32.25
+    },
+    {
+      "year": 2039,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2040,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2041,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2042,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2043,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2044,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2045,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2046,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2047,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2048,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2049,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2050,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2051,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2052,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2053,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2054,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2055,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2056,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2057,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2058,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2059,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2060,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2061,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2062,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2063,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2064,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2065,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2066,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2067,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2068,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2069,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2070,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2071,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2072,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2073,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2074,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2075,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2076,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2077,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2078,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2079,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2080,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2081,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2082,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2083,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2084,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2085,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2086,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2087,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2088,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2089,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2090,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2091,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2092,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2093,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2094,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2095,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2096,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2097,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2098,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2099,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2100,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2101,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2102,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2103,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2104,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2105,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2106,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2107,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2108,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2109,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2110,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2111,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2112,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2113,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2114,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2115,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2116,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2117,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2118,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2119,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2120,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2121,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2122,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2123,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2124,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    },
+    {
+      "year": 2125,
+      "total": 56.91,
+      "proportional": 24.97,
+      "basic": 31.94
+    }
+  ],
+  "balance": [
+    {
+      "year": 2024,
+      "income_trillion_yen": 68.71,
+      "expense_trillion_yen": 52.81,
+      "reserve_trillion_yen": 292.75,
+      "funded_ratio_years": 5.24
+    },
+    {
+      "year": 2025,
+      "income_trillion_yen": 69.66,
+      "expense_trillion_yen": 54.21,
+      "reserve_trillion_yen": 308.2,
+      "funded_ratio_years": 5.4
+    },
+    {
+      "year": 2026,
+      "income_trillion_yen": 71.85,
+      "expense_trillion_yen": 55.02,
+      "reserve_trillion_yen": 325.03,
+      "funded_ratio_years": 5.6
+    },
+    {
+      "year": 2027,
+      "income_trillion_yen": 74.47,
+      "expense_trillion_yen": 56.32,
+      "reserve_trillion_yen": 343.19,
+      "funded_ratio_years": 5.77
+    },
+    {
+      "year": 2028,
+      "income_trillion_yen": 77.22,
+      "expense_trillion_yen": 57.7,
+      "reserve_trillion_yen": 362.7,
+      "funded_ratio_years": 5.95
+    },
+    {
+      "year": 2029,
+      "income_trillion_yen": 80.08,
+      "expense_trillion_yen": 59.28,
+      "reserve_trillion_yen": 383.5,
+      "funded_ratio_years": 6.12
+    },
+    {
+      "year": 2030,
+      "income_trillion_yen": 83.05,
+      "expense_trillion_yen": 60.87,
+      "reserve_trillion_yen": 405.67,
+      "funded_ratio_years": 6.3
+    },
+    {
+      "year": 2031,
+      "income_trillion_yen": 85.99,
+      "expense_trillion_yen": 62.3,
+      "reserve_trillion_yen": 429.36,
+      "funded_ratio_years": 6.51
+    },
+    {
+      "year": 2032,
+      "income_trillion_yen": 88.91,
+      "expense_trillion_yen": 63.92,
+      "reserve_trillion_yen": 454.35,
+      "funded_ratio_years": 6.72
+    },
+    {
+      "year": 2033,
+      "income_trillion_yen": 91.94,
+      "expense_trillion_yen": 65.87,
+      "reserve_trillion_yen": 480.41,
+      "funded_ratio_years": 6.9
+    },
+    {
+      "year": 2034,
+      "income_trillion_yen": 97.73,
+      "expense_trillion_yen": 67.9,
+      "reserve_trillion_yen": 510.24,
+      "funded_ratio_years": 7.08
+    },
+    {
+      "year": 2035,
+      "income_trillion_yen": 101.71,
+      "expense_trillion_yen": 69.99,
+      "reserve_trillion_yen": 541.95,
+      "funded_ratio_years": 7.29
+    },
+    {
+      "year": 2036,
+      "income_trillion_yen": 105.91,
+      "expense_trillion_yen": 72.27,
+      "reserve_trillion_yen": 575.59,
+      "funded_ratio_years": 7.5
+    },
+    {
+      "year": 2037,
+      "income_trillion_yen": 110.26,
+      "expense_trillion_yen": 74.76,
+      "reserve_trillion_yen": 611.09,
+      "funded_ratio_years": 7.7
+    },
+    {
+      "year": 2038,
+      "income_trillion_yen": 114.76,
+      "expense_trillion_yen": 77.45,
+      "reserve_trillion_yen": 648.39,
+      "funded_ratio_years": 7.89
+    },
+    {
+      "year": 2039,
+      "income_trillion_yen": 119.45,
+      "expense_trillion_yen": 80.32,
+      "reserve_trillion_yen": 687.53,
+      "funded_ratio_years": 8.07
+    },
+    {
+      "year": 2040,
+      "income_trillion_yen": 124.34,
+      "expense_trillion_yen": 83.47,
+      "reserve_trillion_yen": 728.4,
+      "funded_ratio_years": 8.24
+    },
+    {
+      "year": 2041,
+      "income_trillion_yen": 129.2,
+      "expense_trillion_yen": 86.6,
+      "reserve_trillion_yen": 771.0,
+      "funded_ratio_years": 8.41
+    },
+    {
+      "year": 2042,
+      "income_trillion_yen": 134.11,
+      "expense_trillion_yen": 89.78,
+      "reserve_trillion_yen": 815.33,
+      "funded_ratio_years": 8.59
+    },
+    {
+      "year": 2043,
+      "income_trillion_yen": 139.23,
+      "expense_trillion_yen": 93.4,
+      "reserve_trillion_yen": 861.16,
+      "funded_ratio_years": 8.73
+    },
+    {
+      "year": 2044,
+      "income_trillion_yen": 144.52,
+      "expense_trillion_yen": 97.08,
+      "reserve_trillion_yen": 908.6,
+      "funded_ratio_years": 8.87
+    },
+    {
+      "year": 2045,
+      "income_trillion_yen": 150.0,
+      "expense_trillion_yen": 100.79,
+      "reserve_trillion_yen": 957.82,
+      "funded_ratio_years": 9.01
+    },
+    {
+      "year": 2046,
+      "income_trillion_yen": 155.7,
+      "expense_trillion_yen": 104.49,
+      "reserve_trillion_yen": 1009.03,
+      "funded_ratio_years": 9.17
+    },
+    {
+      "year": 2047,
+      "income_trillion_yen": 161.64,
+      "expense_trillion_yen": 108.34,
+      "reserve_trillion_yen": 1062.33,
+      "funded_ratio_years": 9.31
+    },
+    {
+      "year": 2048,
+      "income_trillion_yen": 167.82,
+      "expense_trillion_yen": 112.43,
+      "reserve_trillion_yen": 1117.72,
+      "funded_ratio_years": 9.45
+    },
+    {
+      "year": 2049,
+      "income_trillion_yen": 174.25,
+      "expense_trillion_yen": 116.71,
+      "reserve_trillion_yen": 1175.26,
+      "funded_ratio_years": 9.58
+    },
+    {
+      "year": 2050,
+      "income_trillion_yen": 180.94,
+      "expense_trillion_yen": 121.12,
+      "reserve_trillion_yen": 1235.08,
+      "funded_ratio_years": 9.7
+    },
+    {
+      "year": 2051,
+      "income_trillion_yen": 187.89,
+      "expense_trillion_yen": 125.6,
+      "reserve_trillion_yen": 1297.37,
+      "funded_ratio_years": 9.83
+    },
+    {
+      "year": 2052,
+      "income_trillion_yen": 195.09,
+      "expense_trillion_yen": 130.18,
+      "reserve_trillion_yen": 1362.28,
+      "funded_ratio_years": 9.97
+    },
+    {
+      "year": 2053,
+      "income_trillion_yen": 202.54,
+      "expense_trillion_yen": 134.91,
+      "reserve_trillion_yen": 1429.91,
+      "funded_ratio_years": 10.1
+    },
+    {
+      "year": 2054,
+      "income_trillion_yen": 210.26,
+      "expense_trillion_yen": 139.77,
+      "reserve_trillion_yen": 1500.4,
+      "funded_ratio_years": 10.23
+    },
+    {
+      "year": 2055,
+      "income_trillion_yen": 218.25,
+      "expense_trillion_yen": 144.7,
+      "reserve_trillion_yen": 1573.96,
+      "funded_ratio_years": 10.37
+    },
+    {
+      "year": 2056,
+      "income_trillion_yen": 226.56,
+      "expense_trillion_yen": 149.79,
+      "reserve_trillion_yen": 1650.73,
+      "funded_ratio_years": 10.51
+    },
+    {
+      "year": 2057,
+      "income_trillion_yen": 235.18,
+      "expense_trillion_yen": 155.1,
+      "reserve_trillion_yen": 1730.81,
+      "funded_ratio_years": 10.64
+    },
+    {
+      "year": 2058,
+      "income_trillion_yen": 244.11,
+      "expense_trillion_yen": 160.62,
+      "reserve_trillion_yen": 1814.3,
+      "funded_ratio_years": 10.78
+    },
+    {
+      "year": 2059,
+      "income_trillion_yen": 253.36,
+      "expense_trillion_yen": 166.43,
+      "reserve_trillion_yen": 1901.24,
+      "funded_ratio_years": 10.9
+    },
+    {
+      "year": 2060,
+      "income_trillion_yen": 262.96,
+      "expense_trillion_yen": 172.55,
+      "reserve_trillion_yen": 1991.65,
+      "funded_ratio_years": 11.02
+    },
+    {
+      "year": 2061,
+      "income_trillion_yen": 272.86,
+      "expense_trillion_yen": 178.8,
+      "reserve_trillion_yen": 2085.71,
+      "funded_ratio_years": 11.14
+    },
+    {
+      "year": 2062,
+      "income_trillion_yen": 283.09,
+      "expense_trillion_yen": 185.34,
+      "reserve_trillion_yen": 2183.46,
+      "funded_ratio_years": 11.25
+    },
+    {
+      "year": 2063,
+      "income_trillion_yen": 293.64,
+      "expense_trillion_yen": 192.08,
+      "reserve_trillion_yen": 2285.02,
+      "funded_ratio_years": 11.37
+    },
+    {
+      "year": 2064,
+      "income_trillion_yen": 304.51,
+      "expense_trillion_yen": 199.01,
+      "reserve_trillion_yen": 2390.52,
+      "funded_ratio_years": 11.48
+    },
+    {
+      "year": 2065,
+      "income_trillion_yen": 315.72,
+      "expense_trillion_yen": 206.14,
+      "reserve_trillion_yen": 2500.1,
+      "funded_ratio_years": 11.6
+    },
+    {
+      "year": 2066,
+      "income_trillion_yen": 327.27,
+      "expense_trillion_yen": 213.51,
+      "reserve_trillion_yen": 2613.86,
+      "funded_ratio_years": 11.71
+    },
+    {
+      "year": 2067,
+      "income_trillion_yen": 339.14,
+      "expense_trillion_yen": 221.04,
+      "reserve_trillion_yen": 2731.96,
+      "funded_ratio_years": 11.83
+    },
+    {
+      "year": 2068,
+      "income_trillion_yen": 351.38,
+      "expense_trillion_yen": 228.75,
+      "reserve_trillion_yen": 2854.59,
+      "funded_ratio_years": 11.94
+    },
+    {
+      "year": 2069,
+      "income_trillion_yen": 363.99,
+      "expense_trillion_yen": 236.65,
+      "reserve_trillion_yen": 2981.92,
+      "funded_ratio_years": 12.06
+    },
+    {
+      "year": 2070,
+      "income_trillion_yen": 376.97,
+      "expense_trillion_yen": 244.71,
+      "reserve_trillion_yen": 3114.19,
+      "funded_ratio_years": 12.19
+    },
+    {
+      "year": 2071,
+      "income_trillion_yen": 390.36,
+      "expense_trillion_yen": 252.94,
+      "reserve_trillion_yen": 3251.61,
+      "funded_ratio_years": 12.31
+    },
+    {
+      "year": 2072,
+      "income_trillion_yen": 404.22,
+      "expense_trillion_yen": 261.62,
+      "reserve_trillion_yen": 3394.22,
+      "funded_ratio_years": 12.43
+    },
+    {
+      "year": 2073,
+      "income_trillion_yen": 418.52,
+      "expense_trillion_yen": 270.64,
+      "reserve_trillion_yen": 3542.1,
+      "funded_ratio_years": 12.54
+    },
+    {
+      "year": 2074,
+      "income_trillion_yen": 433.27,
+      "expense_trillion_yen": 279.95,
+      "reserve_trillion_yen": 3695.42,
+      "funded_ratio_years": 12.65
+    },
+    {
+      "year": 2075,
+      "income_trillion_yen": 448.5,
+      "expense_trillion_yen": 289.56,
+      "reserve_trillion_yen": 3854.37,
+      "funded_ratio_years": 12.76
+    },
+    {
+      "year": 2076,
+      "income_trillion_yen": 464.23,
+      "expense_trillion_yen": 299.53,
+      "reserve_trillion_yen": 4019.07,
+      "funded_ratio_years": 12.87
+    },
+    {
+      "year": 2077,
+      "income_trillion_yen": 480.43,
+      "expense_trillion_yen": 309.79,
+      "reserve_trillion_yen": 4189.71,
+      "funded_ratio_years": 12.97
+    },
+    {
+      "year": 2078,
+      "income_trillion_yen": 497.17,
+      "expense_trillion_yen": 320.39,
+      "reserve_trillion_yen": 4366.49,
+      "funded_ratio_years": 13.08
+    },
+    {
+      "year": 2079,
+      "income_trillion_yen": 514.5,
+      "expense_trillion_yen": 331.35,
+      "reserve_trillion_yen": 4549.64,
+      "funded_ratio_years": 13.18
+    },
+    {
+      "year": 2080,
+      "income_trillion_yen": 532.43,
+      "expense_trillion_yen": 342.7,
+      "reserve_trillion_yen": 4739.36,
+      "funded_ratio_years": 13.28
+    },
+    {
+      "year": 2081,
+      "income_trillion_yen": 550.97,
+      "expense_trillion_yen": 354.37,
+      "reserve_trillion_yen": 4935.97,
+      "funded_ratio_years": 13.37
+    },
+    {
+      "year": 2082,
+      "income_trillion_yen": 570.15,
+      "expense_trillion_yen": 366.12,
+      "reserve_trillion_yen": 5140.01,
+      "funded_ratio_years": 13.48
+    },
+    {
+      "year": 2083,
+      "income_trillion_yen": 590.01,
+      "expense_trillion_yen": 377.93,
+      "reserve_trillion_yen": 5352.08,
+      "funded_ratio_years": 13.6
+    },
+    {
+      "year": 2084,
+      "income_trillion_yen": 610.55,
+      "expense_trillion_yen": 389.77,
+      "reserve_trillion_yen": 5572.86,
+      "funded_ratio_years": 13.73
+    },
+    {
+      "year": 2085,
+      "income_trillion_yen": 631.81,
+      "expense_trillion_yen": 401.67,
+      "reserve_trillion_yen": 5802.99,
+      "funded_ratio_years": 13.87
+    },
+    {
+      "year": 2086,
+      "income_trillion_yen": 653.87,
+      "expense_trillion_yen": 413.69,
+      "reserve_trillion_yen": 6043.17,
+      "funded_ratio_years": 14.03
+    },
+    {
+      "year": 2087,
+      "income_trillion_yen": 676.79,
+      "expense_trillion_yen": 425.77,
+      "reserve_trillion_yen": 6294.19,
+      "funded_ratio_years": 14.19
+    },
+    {
+      "year": 2088,
+      "income_trillion_yen": 700.61,
+      "expense_trillion_yen": 437.84,
+      "reserve_trillion_yen": 6556.96,
+      "funded_ratio_years": 14.38
+    },
+    {
+      "year": 2089,
+      "income_trillion_yen": 725.42,
+      "expense_trillion_yen": 450.24,
+      "reserve_trillion_yen": 6832.14,
+      "funded_ratio_years": 14.56
+    },
+    {
+      "year": 2090,
+      "income_trillion_yen": 751.26,
+      "expense_trillion_yen": 463.12,
+      "reserve_trillion_yen": 7120.28,
+      "funded_ratio_years": 14.75
+    },
+    {
+      "year": 2091,
+      "income_trillion_yen": 778.14,
+      "expense_trillion_yen": 476.43,
+      "reserve_trillion_yen": 7422.0,
+      "funded_ratio_years": 14.95
+    },
+    {
+      "year": 2092,
+      "income_trillion_yen": 806.12,
+      "expense_trillion_yen": 490.2,
+      "reserve_trillion_yen": 7737.92,
+      "funded_ratio_years": 15.14
+    },
+    {
+      "year": 2093,
+      "income_trillion_yen": 835.23,
+      "expense_trillion_yen": 504.48,
+      "reserve_trillion_yen": 8068.68,
+      "funded_ratio_years": 15.34
+    },
+    {
+      "year": 2094,
+      "income_trillion_yen": 865.45,
+      "expense_trillion_yen": 519.3,
+      "reserve_trillion_yen": 8414.83,
+      "funded_ratio_years": 15.54
+    },
+    {
+      "year": 2095,
+      "income_trillion_yen": 896.8,
+      "expense_trillion_yen": 534.66,
+      "reserve_trillion_yen": 8776.96,
+      "funded_ratio_years": 15.74
+    },
+    {
+      "year": 2096,
+      "income_trillion_yen": 929.32,
+      "expense_trillion_yen": 550.57,
+      "reserve_trillion_yen": 9155.72,
+      "funded_ratio_years": 15.94
+    },
+    {
+      "year": 2097,
+      "income_trillion_yen": 963.05,
+      "expense_trillion_yen": 567.0,
+      "reserve_trillion_yen": 9551.78,
+      "funded_ratio_years": 16.15
+    },
+    {
+      "year": 2098,
+      "income_trillion_yen": 998.03,
+      "expense_trillion_yen": 583.94,
+      "reserve_trillion_yen": 9965.86,
+      "funded_ratio_years": 16.36
+    },
+    {
+      "year": 2099,
+      "income_trillion_yen": 1034.28,
+      "expense_trillion_yen": 601.38,
+      "reserve_trillion_yen": 10398.76,
+      "funded_ratio_years": 16.57
+    },
+    {
+      "year": 2100,
+      "income_trillion_yen": 1071.87,
+      "expense_trillion_yen": 619.31,
+      "reserve_trillion_yen": 10851.33,
+      "funded_ratio_years": 16.79
+    },
+    {
+      "year": 2101,
+      "income_trillion_yen": 1110.85,
+      "expense_trillion_yen": 637.72,
+      "reserve_trillion_yen": 11324.47,
+      "funded_ratio_years": 17.02
+    },
+    {
+      "year": 2102,
+      "income_trillion_yen": 1151.29,
+      "expense_trillion_yen": 656.61,
+      "reserve_trillion_yen": 11819.15,
+      "funded_ratio_years": 17.25
+    },
+    {
+      "year": 2103,
+      "income_trillion_yen": 1193.25,
+      "expense_trillion_yen": 675.99,
+      "reserve_trillion_yen": 12336.41,
+      "funded_ratio_years": 17.48
+    },
+    {
+      "year": 2104,
+      "income_trillion_yen": 1236.81,
+      "expense_trillion_yen": 695.88,
+      "reserve_trillion_yen": 12877.35,
+      "funded_ratio_years": 17.73
+    },
+    {
+      "year": 2105,
+      "income_trillion_yen": 1282.05,
+      "expense_trillion_yen": 716.28,
+      "reserve_trillion_yen": 13443.12,
+      "funded_ratio_years": 17.98
+    },
+    {
+      "year": 2106,
+      "income_trillion_yen": 1329.05,
+      "expense_trillion_yen": 737.23,
+      "reserve_trillion_yen": 14034.94,
+      "funded_ratio_years": 18.23
+    },
+    {
+      "year": 2107,
+      "income_trillion_yen": 1377.91,
+      "expense_trillion_yen": 758.73,
+      "reserve_trillion_yen": 14654.12,
+      "funded_ratio_years": 18.5
+    },
+    {
+      "year": 2108,
+      "income_trillion_yen": 1428.72,
+      "expense_trillion_yen": 780.81,
+      "reserve_trillion_yen": 15302.03,
+      "funded_ratio_years": 18.77
+    },
+    {
+      "year": 2109,
+      "income_trillion_yen": 1481.58,
+      "expense_trillion_yen": 803.48,
+      "reserve_trillion_yen": 15980.14,
+      "funded_ratio_years": 19.04
+    },
+    {
+      "year": 2110,
+      "income_trillion_yen": 1536.6,
+      "expense_trillion_yen": 826.75,
+      "reserve_trillion_yen": 16689.98,
+      "funded_ratio_years": 19.33
+    },
+    {
+      "year": 2111,
+      "income_trillion_yen": 1593.89,
+      "expense_trillion_yen": 850.64,
+      "reserve_trillion_yen": 17433.23,
+      "funded_ratio_years": 19.62
+    },
+    {
+      "year": 2112,
+      "income_trillion_yen": 1653.55,
+      "expense_trillion_yen": 875.14,
+      "reserve_trillion_yen": 18211.64,
+      "funded_ratio_years": 19.92
+    },
+    {
+      "year": 2113,
+      "income_trillion_yen": 1715.73,
+      "expense_trillion_yen": 900.26,
+      "reserve_trillion_yen": 19027.12,
+      "funded_ratio_years": 20.23
+    },
+    {
+      "year": 2114,
+      "income_trillion_yen": 1780.54,
+      "expense_trillion_yen": 926.0,
+      "reserve_trillion_yen": 19881.66,
+      "funded_ratio_years": 20.55
+    },
+    {
+      "year": 2115,
+      "income_trillion_yen": 1848.12,
+      "expense_trillion_yen": 952.37,
+      "reserve_trillion_yen": 20777.41,
+      "funded_ratio_years": 20.88
+    },
+    {
+      "year": 2116,
+      "income_trillion_yen": 1918.61,
+      "expense_trillion_yen": 979.38,
+      "reserve_trillion_yen": 21716.63,
+      "funded_ratio_years": 21.21
+    },
+    {
+      "year": 2117,
+      "income_trillion_yen": 1992.15,
+      "expense_trillion_yen": 1007.05,
+      "reserve_trillion_yen": 22701.73,
+      "funded_ratio_years": 21.56
+    },
+    {
+      "year": 2118,
+      "income_trillion_yen": 2068.9,
+      "expense_trillion_yen": 1035.41,
+      "reserve_trillion_yen": 23735.22,
+      "funded_ratio_years": 21.93
+    },
+    {
+      "year": 2119,
+      "income_trillion_yen": 2149.01,
+      "expense_trillion_yen": 1064.5,
+      "reserve_trillion_yen": 24819.73,
+      "funded_ratio_years": 22.3
+    },
+    {
+      "year": 2120,
+      "income_trillion_yen": 2232.65,
+      "expense_trillion_yen": 1094.36,
+      "reserve_trillion_yen": 25958.02,
+      "funded_ratio_years": 22.68
+    },
+    {
+      "year": 2121,
+      "income_trillion_yen": 2319.97,
+      "expense_trillion_yen": 1125.03,
+      "reserve_trillion_yen": 27152.96,
+      "funded_ratio_years": 23.07
+    },
+    {
+      "year": 2122,
+      "income_trillion_yen": 2411.14,
+      "expense_trillion_yen": 1156.57,
+      "reserve_trillion_yen": 28407.53,
+      "funded_ratio_years": 23.48
+    },
+    {
+      "year": 2123,
+      "income_trillion_yen": 2506.33,
+      "expense_trillion_yen": 1189.02,
+      "reserve_trillion_yen": 29724.85,
+      "funded_ratio_years": 23.89
+    },
+    {
+      "year": 2124,
+      "income_trillion_yen": 2605.72,
+      "expense_trillion_yen": 1222.43,
+      "reserve_trillion_yen": 31108.14,
+      "funded_ratio_years": 24.32
+    },
+    {
+      "year": 2125,
+      "income_trillion_yen": 2709.48,
+      "expense_trillion_yen": 1256.85,
+      "reserve_trillion_yen": 32560.76,
+      "funded_ratio_years": 24.75
+    }
+  ],
+  "official_comparison": [
+    {
+      "metric": "所得代替率(2024年度時点)",
+      "model_value": "61.2%",
+      "official_value": "61.2%",
+      "diff": "-0.02pt",
+      "diff_ok": true
+    },
+    {
+      "metric": "所得代替率(調整終了後, 2039年度)",
+      "model_value": "56.9%",
+      "official_value": "56.9%(2039年度, 中位推計人口)",
+      "diff": "+0.01pt",
+      "diff_ok": true
+    }
+  ],
+  "status_note": "本データはGitHub Actions上で厚労省公開Cプログラムを再ビルド・実行して生成したものです。経済前提3001は厚労省「財政検証結果レポート2024」の<b>高成長実現ケース</b>に相当することを、経済前提入力CSV(実質賃金上昇率・物価上昇率・実質運用利回り)の値を4ケース分すべて突き合わせて確認しました。所得代替率は基準年度(2024年度)・調整終了後の値とも公式値と概ね一致しています。"
+}
