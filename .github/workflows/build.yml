@@ -39,14 +39,19 @@ jobs:
 
       - name: Build nat
         # Despite the .c extension, this source uses C++ headers (<cstdio> etc.).
-        # -D_POSIX_C_SOURCE: the source defines its own fdiv(double,double),
-        # which collides with glibc's C23 narrowing fdiv() declared in
-        # <bits/mathcalls-narrow.h> (pulled in via <cmath> when GNU/BSD
-        # extensions are enabled). Restricting to POSIX feature macros keeps
-        # that header out without touching the original source.
+        # The source defines its own fdiv(double,double), which collides with
+        # glibc's C23 narrowing fdiv() declared unconditionally for C++ in
+        # <bits/mathcalls-narrow.h>. A -D rename doesn't work here (it would
+        # rename glibc's declaration too, since preprocessing is textual and
+        # blind to origin). Instead rename only within a build-only copy of
+        # this module's source; the committed source under source/nat is
+        # untouched.
         working-directory: source/nat
         run: |
-          g++ -g -D_POSIX_C_SOURCE=200809L -D_XOPEN_SOURCE=700 -o ../../bin/nat \
+          rm -rf /tmp/build_nat && cp -r . /tmp/build_nat
+          sed -i 's/\bfdiv\b/fdiv_nat_impl/g' /tmp/build_nat/*.c /tmp/build_nat/*.h
+          cd /tmp/build_nat
+          g++ -g -o "$GITHUB_WORKSPACE/bin/nat" \
             main.c stdfm.c cntl.c file_open.c seid.c econ.c waku.c \
             kaizen.c dtst.c kiso.c noufuritu.c siml.c str_op.c shke.c \
             stat.c printout.c -lm
