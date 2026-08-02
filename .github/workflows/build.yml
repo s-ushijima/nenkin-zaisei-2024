@@ -27,10 +27,21 @@ jobs:
             simlroud.c stdfm.c zero.c -lm
 
       - name: Build bas
-        # Despite the .c extension, this source uses C++ headers (<cstdio> etc.)
+        # Despite the .c extension, this source uses C++ headers (<cstdio> etc.).
+        # main.c double-closes fp_in[0]: read_file.c already does
+        # fclose(fp_in[DOKUZI]) (DOKUZI == 0, mfile_open.h), then main.c
+        # calls fclose(fp_in[0]) again a few lines later. This is a genuine
+        # bug in the original source -- glibc's malloc detects the double
+        # free ("double free or corruption (!prev)") where the program's
+        # original Unix host apparently did not. Same build-only-copy+sed
+        # approach as nat/emp_kyufu: drop the redundant second close: the
+        # committed source under source/bas is untouched.
         working-directory: source/bas
         run: |
-          g++ -g -o ../../bin/bas \
+          rm -rf /tmp/build_bas && cp -r . /tmp/build_bas
+          sed -i '/fclose( fp_in\[0\] );/d' /tmp/build_bas/main.c
+          cd /tmp/build_bas
+          g++ -g -o "$GITHUB_WORKSPACE/bin/bas" \
             Atamawari.c Atamawari_cut.c cntl.c econ.c file_open.c \
             file_write_cut.c file_write_kakyu.c main.c printout.c \
             read_cut.c read_file.c ReadHiyousha.c ReadKokunen_jisseki.c \
