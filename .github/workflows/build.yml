@@ -230,9 +230,25 @@ jobs:
         #   CUT_KOTEI=0                 カット固定なし
         #   CUT_ONE_SHUTU=0             標準
         run: |
+          echo "core.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
+          ulimit -c unlimited
+          set +e
           ./bin/bas \
             /suuri/rev2024/bas/io_file/infile.csv \
             /suuri/rev2024/bas/io_file/outfile.csv \
             1000 1000 3001 1000 1000 000 0 1 0 0 2031 3 0 0 0
-          echo "--- exit code: $? ---"
+          status=$?
+          set -e
+          echo "--- exit code: $status ---"
           find /suuri/rev2024/bas/rslt /suuri/rev2024/bas/data /suuri/rev2024/bas/settei -type f | sort
+          if [ "$status" -ne 0 ]; then
+            echo "--- looking for core dump ---"
+            core=$(find "$GITHUB_WORKSPACE" -maxdepth 2 -iname 'core*' 2>/dev/null | head -1)
+            if [ -n "$core" ]; then
+              echo "--- backtrace ($core) ---"
+              gdb -q -batch -ex "bt full" ./bin/bas "$core"
+            else
+              echo "no core dump found"
+            fi
+            exit "$status"
+          fi
