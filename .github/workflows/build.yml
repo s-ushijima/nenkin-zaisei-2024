@@ -38,10 +38,13 @@ jobs:
             dokuzi_cal.c -lm
 
       - name: Build nat
-        # Despite the .c extension, this source uses C++ headers (<cstdio> etc.)
+        # Despite the .c extension, this source uses C++ headers (<cstdio> etc.).
+        # -Dfdiv=fdiv_nat_impl: the source defines its own fdiv(double,double),
+        # which collides with glibc's C23 narrowing fdiv() pulled in via <cmath>
+        # on modern toolchains. Renamed at preprocess time only; source untouched.
         working-directory: source/nat
         run: |
-          g++ -g -o ../../bin/nat \
+          g++ -g -Dfdiv=fdiv_nat_impl -o ../../bin/nat \
             main.c stdfm.c cntl.c file_open.c seid.c econ.c waku.c \
             kaizen.c dtst.c kiso.c noufuritu.c siml.c str_op.c shke.c \
             stat.c printout.c -lm
