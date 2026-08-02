@@ -64,9 +64,21 @@ jobs:
             shus.c shus_calc.c shus_out.c shus_fullout.c -lm
 
       - name: Build emp_kyufu (usys20)
+        # fp_map[key] is used as a *read* in many files (e.g. dtst.cpp,
+        # econ.cpp, seid.cpp). std::map::operator[] silently inserts a
+        # NULL-valued entry for any key that was never opened by fopn(), and
+        # fcls() then calls fclose() on every entry unconditionally --
+        # fclose(NULL) is undefined behaviour; glibc segfaults on it. On the
+        # program's original Unix host this most likely was a silent no-op
+        # (consistent with the source never guarding it). We only guard the
+        # fclose() call itself in a build-only copy; committed source under
+        # source/emp_kyufu is untouched.
         working-directory: source/emp_kyufu
         run: |
-          g++ -g -I ext -I common -I lib -o ../../bin/emp_kyufu \
+          rm -rf /tmp/build_empkyufu && cp -r . /tmp/build_empkyufu
+          sed -i 's/fclose(itr->second);/if (itr->second) fclose(itr->second);/' /tmp/build_empkyufu/fileio.cpp
+          cd /tmp/build_empkyufu
+          g++ -g -I ext -I common -I lib -o "$GITHUB_WORKSPACE/bin/emp_kyufu" \
             sepslib.cpp main.cpp zero.cpp cntl.cpp sepsd.cpp fileio.cpp \
             flck.cpp waku.cpp econ.cpp seid.cpp krgn.cpp kiso.cpp sknr.cpp \
             subrh.cpp subrj.cpp dtst.cpp shke.cpp shkehiho.cpp shkejken.cpp \
