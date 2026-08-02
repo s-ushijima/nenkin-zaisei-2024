@@ -142,3 +142,32 @@ jobs:
             1000 3001 1000 0 M 0 1 0 2027 0 2031 3 1000
           echo "--- exit code: $? ---"
           find /suuri/rev2024/nat/rslt /suuri/rev2024/nat/data -type f | sort
+
+      # --- Run emp_kyufu (usys20) against the standard scenario ---
+      - name: Set up /suuri/rev2024 tree for emp_kyufu
+        # Output subdirectories enumerated from source/emp_kyufu/fileio.cpp
+        # (fopen() calls with mode "w" under /emp/rslt/u-rev/...); none of
+        # these get created automatically.
+        run: |
+          sudo mkdir -p /suuri/rev2024/emp/rslt/u-rev/{shus,kiso,bunpu,kaite,hikaku,ashimoto,hou,kisor}
+          sudo chown -R "$(id -u):$(id -g)" /suuri
+
+      - name: Run emp_kyufu (usys20, standard scenario)
+        # Stdin sequence (source/emp_kyufu/main.cpp then cntl.cpp), one value per line:
+        #   key=11       標準実行 (11: 通常実行)
+        #   iname=1000   試算番号
+        #   iecon=3001   経済前提番号
+        #   iwname=1000  外枠番号 -- matches wakuc's BANGO output above
+        #   seimei=4     生命表: 死亡中位
+        #   flg_part=0   パート適用拡大: なし(標準実行)
+        #   flg_sigo=0   在職老齢年金45年改正: なし
+        #   flg_kozax=0  在職老齢年金支給停止基準額の特例: なし
+        #   houjou=0     標準報酬月額上限特例: なし
+        #   flg_inout=0  単身・扶養判定範囲: 標準
+        # main.cpp internally loops over pseid in {0,1,4,5} (kou/kok/ren/sig)
+        # automatically when key==11, so this single invocation covers all
+        # four institutions.
+        run: |
+          printf '11\n1000\n3001\n1000\n4\n0\n0\n0\n0\n0\n' | ./bin/emp_kyufu
+          echo "--- exit code: $? ---"
+          find /suuri/rev2024/emp/rslt/u-rev -type f | sort
