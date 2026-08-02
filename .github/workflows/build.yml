@@ -82,3 +82,28 @@ jobs:
         with:
           name: binaries
           path: bin/
+
+      # --- Run wakuc against the standard scenario ---
+      # The original programs are hardcoded to read/write under the absolute
+      # path /suuri/rev2024/<module>/... (a convention from the original
+      # Unix host). We recreate that tree here rather than patch the source,
+      # to keep the reference implementation byte-for-byte faithful.
+      - name: Set up /suuri/rev2024 tree for wakuc
+        run: |
+          sudo mkdir -p /suuri/rev2024/wakuc
+          sudo chown -R "$(id -u):$(id -g)" /suuri
+          cp -r data/wakuc/data /suuri/rev2024/wakuc/data
+
+      - name: Run wakuc (standard scenario)
+        # CP sequence (source/wakuc/cntl.c), one value per line:
+        #   BANGO=1000  (試算番号)
+        #   MODE=0      (経済シナリオ: 標準)
+        #   MODE45=0    (令和4/5年度前提の別: 標準)
+        #   JIN=2       (人口: 中位)
+        #   QX=1        (死亡率: 中位) -- only JIN=2,QX=1,NC=0 data is shipped (pop2-210.csv)
+        #   NC=0        (人口前提バージョン: 令和5年推計相当のベース)
+        #   ROUDR=1     (労働力率: 成長型経済移行・継続ケース, 16年度基準)
+        run: |
+          printf '1000\n0\n0\n2\n1\n0\n1\n' | ./bin/wakuc
+          echo "--- exit code: $? ---"
+          find /suuri/rev2024/wakuc/rslt -type f | sort
