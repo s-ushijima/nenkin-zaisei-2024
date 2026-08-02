@@ -27,9 +27,10 @@ jobs:
             simlroud.c stdfm.c zero.c -lm
 
       - name: Build bas
+        # Despite the .c extension, this source uses C++ headers (<cstdio> etc.)
         working-directory: source/bas
         run: |
-          gcc -g -o ../../bin/bas \
+          g++ -g -o ../../bin/bas \
             Atamawari.c Atamawari_cut.c cntl.c econ.c file_open.c \
             file_write_cut.c file_write_kakyu.c main.c printout.c \
             read_cut.c read_file.c ReadHiyousha.c ReadKokunen_jisseki.c \
@@ -37,9 +38,10 @@ jobs:
             dokuzi_cal.c -lm
 
       - name: Build nat
+        # Despite the .c extension, this source uses C++ headers (<cstdio> etc.)
         working-directory: source/nat
         run: |
-          gcc -g -o ../../bin/nat \
+          g++ -g -o ../../bin/nat \
             main.c stdfm.c cntl.c file_open.c seid.c econ.c waku.c \
             kaizen.c dtst.c kiso.c noufuritu.c siml.c str_op.c shke.c \
             stat.c printout.c -lm
