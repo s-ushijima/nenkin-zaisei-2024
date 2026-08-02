@@ -168,7 +168,8 @@ jobs:
         # automatically when key==11, so this single invocation covers all
         # four institutions.
         run: |
-          sudo apt-get install -y gdb >/dev/null
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends gdb
           echo "core.%p" | sudo tee /proc/sys/kernel/core_pattern >/dev/null
           ulimit -c unlimited
           ulimit -s unlimited || true
