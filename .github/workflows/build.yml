@@ -112,3 +112,30 @@ jobs:
           printf '1000\n0\n0\n2\n1\n0\n1\n' | ./bin/wakuc
           echo "--- exit code: $? ---"
           find /suuri/rev2024/wakuc/rslt -type f | sort
+
+      # --- Run nat against the standard scenario ---
+      - name: Set up /suuri/rev2024 tree for nat
+        run: |
+          sudo mkdir -p /suuri/rev2024/nat/rslt /suuri/rev2024/nat/data /suuri/rev2024/nat/base_data /suuri/rev2024/nat/io_file
+          sudo chown -R "$(id -u):$(id -g)" /suuri
+          cp -r data/nat/base_data/* /suuri/rev2024/nat/base_data/
+          cp -r data/nat/io_file/* /suuri/rev2024/nat/io_file/
+
+      - name: Run nat (standard scenario)
+        # CLI args (source/nat/cntl.c), in order after infile/outfile:
+        #   KOKUNEN=1000        試算番号
+        #   ECON=3001           経済前提(econ-3001.csv)
+        #   SOTOWAKU=1000       外枠番号 -- matches wakuc's BANGO output above
+        #   BIRTH=0             出生前提(birth_ratio_0.csv)
+        #   DEATH=M             死亡前提・中位(QX-M2023.csv)
+        #   KAKO=0              過去改正なし
+        #   TINSURA=1、KAKUDAI=0、KAKUDAI_YEAR=2027、OPTION=0、OP_START=2031、
+        #   OP_HIKIAGE_KANKAKU=3 -- jikko_nat.sh の標準デフォルト値をそのまま採用
+        #   SOTOWAKU_JURAI=1000 同上、wakuc出力を再利用
+        run: |
+          ./bin/nat \
+            /suuri/rev2024/nat/io_file/infile.csv \
+            /suuri/rev2024/nat/io_file/outfile.csv \
+            1000 3001 1000 0 M 0 1 0 2027 0 2031 3 1000
+          echo "--- exit code: $? ---"
+          find /suuri/rev2024/nat/rslt /suuri/rev2024/nat/data -type f | sort
